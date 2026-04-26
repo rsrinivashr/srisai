@@ -135,6 +135,13 @@ textarea{resize:vertical;min-height:50px;}
 /* ADMIN PANEL */
 .admin-box{background:#fef9e7;border:2px solid var(--amber);border-radius:11px;padding:13px;margin-bottom:10px;}
 .admin-box .card-title{color:var(--amber);}
+/* EDIT OVERLAY */
+#editOv{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:700;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 0;}
+#editOv.show{display:flex;}
+#editBox{background:#fff;border-radius:14px;width:93%;max-width:420px;box-shadow:0 8px 28px rgba(0,0,0,.35);padding:16px;margin:auto;}
+#editBox h3{font-size:15px;font-weight:800;margin-bottom:12px;color:var(--hdr);}
+.edit-actions{display:flex;gap:8px;margin-top:12px;}
+.edit-actions .btn{flex:1;padding:12px;font-size:13px;}
 </style>
 </head>
 <body>
@@ -150,17 +157,17 @@ textarea{resize:vertical;min-height:50px;}
     <div class="pin-dot" id="d3"></div>
   </div>
   <div class="pin-pad">
-    <button class="pin-btn" ontouchstart="pinKey(1)" onclick="pinKey(1)">1</button>
-    <button class="pin-btn" ontouchstart="pinKey(2)" onclick="pinKey(2)">2</button>
-    <button class="pin-btn" ontouchstart="pinKey(3)" onclick="pinKey(3)">3</button>
-    <button class="pin-btn" ontouchstart="pinKey(4)" onclick="pinKey(4)">4</button>
-    <button class="pin-btn" ontouchstart="pinKey(5)" onclick="pinKey(5)">5</button>
-    <button class="pin-btn" ontouchstart="pinKey(6)" onclick="pinKey(6)">6</button>
-    <button class="pin-btn" ontouchstart="pinKey(7)" onclick="pinKey(7)">7</button>
-    <button class="pin-btn" ontouchstart="pinKey(8)" onclick="pinKey(8)">8</button>
-    <button class="pin-btn" ontouchstart="pinKey(9)" onclick="pinKey(9)">9</button>
-    <button class="pin-btn zero" ontouchstart="pinKey(0)" onclick="pinKey(0)">0</button>
-    <button class="pin-btn del" ontouchstart="pinDel()" onclick="pinDel()">&#9003;</button>
+    <button class="pin-btn" ontouchstart="event.preventDefault();pinKey(1)">1</button>
+    <button class="pin-btn" ontouchstart="event.preventDefault();pinKey(2)">2</button>
+    <button class="pin-btn" ontouchstart="event.preventDefault();pinKey(3)">3</button>
+    <button class="pin-btn" ontouchstart="event.preventDefault();pinKey(4)">4</button>
+    <button class="pin-btn" ontouchstart="event.preventDefault();pinKey(5)">5</button>
+    <button class="pin-btn" ontouchstart="event.preventDefault();pinKey(6)">6</button>
+    <button class="pin-btn" ontouchstart="event.preventDefault();pinKey(7)">7</button>
+    <button class="pin-btn" ontouchstart="event.preventDefault();pinKey(8)">8</button>
+    <button class="pin-btn" ontouchstart="event.preventDefault();pinKey(9)">9</button>
+    <button class="pin-btn zero" ontouchstart="event.preventDefault();pinKey(0)">0</button>
+    <button class="pin-btn del" ontouchstart="event.preventDefault();pinDel()">&#9003;</button>
   </div>
   <div id="pinErr"></div>
   <div id="roleTag"></div>
@@ -377,6 +384,18 @@ textarea{resize:vertical;min-height:50px;}
 
 </div>
 
+<!-- EDIT OVERLAY -->
+<div id="editOv">
+  <div id="editBox">
+    <h3 id="editTitle">Edit Record</h3>
+    <div id="editFields"></div>
+    <div class="edit-actions">
+      <button class="btn btn-save" ontouchstart="saveEdit()" onclick="saveEdit()">Save Changes</button>
+      <button class="btn" style="background:var(--muted);" ontouchstart="closeEdit()" onclick="closeEdit()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- TABS -->
 <div class="tabs">
   <button ontouchstart="showTab('home',this)" onclick="showTab('home',this)" class="active"><span class="ti">&#127968;</span>Home</button>
@@ -581,7 +600,7 @@ const calcDue  = () => { const t=parseFloat(g("sAmt").value)||0,a=parseFloat(g("
 const toggleDel= () => { g("delFields").style.display=g("sDelivery").value==="yes"?"block":"none"; };
 const stOf     = s => { const t=s.amt||0,a=s.adv||0; if(t<=0||a>=t)return"closed"; if(a>0)return"inprog"; return"pending"; };
 const due      = s => Math.max(0,(s.amt||0)-(s.adv||0));
-const fmtP     = p => { if(!p)return null; const n=p.replace(/[^0-9]/g,""); return n.length===10?"91"+n:n; };
+const fmtP     = p => { if(!p)return null; const n=p.replace(/[^0-9]/g,""); if(n.length===10)return"91"+n; if(n.length===12&&n.startsWith("91"))return n; return n; };
 const openWA   = (phone,msg) => { const p=fmtP(phone); if(!p){alert("No phone number saved.");return;} window.open("https://wa.me/"+p+"?text="+encodeURIComponent(msg),"_blank"); };
 const dateBadge= d => { if(!d)return""; if(d<TODAY)return"<span class='badge b-overdue'>Overdue</span>"; if(d===TODAY)return"<span class='badge b-today'>Today</span>"; return""; };
 const priColor = p => p==="Hot"?"#e74c3c":p==="Warm"?"#d4ac0d":"#2471a3";
@@ -681,6 +700,52 @@ function markLeadDone(i){db.leads[i].done=true;saveDB();render();checkRem();}
 function callCust(phone){if(phone)window.location.href="tel:"+phone;else alert("No phone saved.");}
 function waCust(phone){if(!phone){alert("No phone saved.");return;}window.open("https://wa.me/"+fmtP(phone),"_blank");}
 
+function waOrder(i) {
+  const o=db.orders[i];
+  if(!o.phone){alert("No phone number for this order.");return;}
+  const extra=prompt("Add a message to send with delivery update (optional):
+
+Leave blank to send standard message:","") || "";
+  const msg="*Sri Sai Home Needs - Delivery Update*
+
+Dear "+o.n+",
+
+Your order"+(o.item?" for *"+o.item+"*":"")+" is scheduled for delivery on *"+o.d+"*."+(o.addr?"
+
+Delivery Address: "+o.addr:"")+(extra?"
+
+"+extra:"")+"
+
+For any queries please contact us.
+
+Find us: https://maps.app.goo.gl/5PPPGwWJW8PUs7EN6
+Sri Sai Home Needs, Chandanagar";
+  openWA(o.phone, msg);
+}
+
+function waPayment(i) {
+  const x=db.payments[i];
+  if(!x.phone){alert("No phone number for this payment.");return;}
+  const extra=prompt("Add a message to send with payment reminder (optional):
+
+Leave blank to send standard message:","") || "";
+  const msg="*Sri Sai Home Needs - Payment Reminder*
+
+Dear "+x.n+",
+
+This is a gentle reminder that a payment of *Rs."+x.a.toFixed(2)+"* is due on *"+x.d+"*."+(x.bill?"
+
+Reference: "+x.bill:"")+(extra?"
+
+"+extra:"")+"
+
+Please make the payment at your earliest convenience. Thank you!
+
+Find us: https://maps.app.goo.gl/5PPPGwWJW8PUs7EN6
+Sri Sai Home Needs, Chandanagar";
+  openWA(x.phone, msg);
+}
+
 function waFollowup(i) {
   const l=db.leads[i];
   if(!l.phone){alert("No phone number for this lead.");return;}
@@ -688,56 +753,112 @@ function waFollowup(i) {
   openWA(l.phone,msg);
 }
 
-// Full edit functions for all sections
-function editSN(i) {
-  const s=db.sales[i];
-  const n=prompt("Edit Customer Name:",s.n||""); if(n&&n.trim()) s.n=n.trim();
-  const p=prompt("Edit Phone:",s.phone||""); if(p!==null) s.phone=p.trim();
-  const it=prompt("Edit Item / Product:",s.item||""); if(it!==null) s.item=it.trim();
-  const am=prompt("Edit Total Amount (Rs):",s.amt||""); if(am&&!isNaN(am)) s.amt=parseFloat(am);
-  const ad=prompt("Edit Advance Paid (Rs):",s.adv||0); if(ad!==null&&!isNaN(ad)) s.adv=parseFloat(ad)||0;
-  const dd=prompt("Edit Due Date (YYYY-MM-DD):",s.dueDate||""); if(dd!==null) s.dueDate=dd.trim();
-  const dt=prompt("Edit Sale Date (YYYY-MM-DD):",s.date||""); if(dt&&dt.trim()) s.date=dt.trim();
-  const nt=prompt("Edit Note:",s.note||""); if(nt!==null) s.note=nt;
-  saveDB();render();
+// ================================================================
+// EDIT OVERLAY SYSTEM - shows all fields at once
+// ================================================================
+let editCtx = null; // {type, idx}
+
+function fg(lbl, id, val, type="text") {
+  return "<div class='fg'><label>"+lbl+"</label><input id='ef_"+id+"' type='"+type+"' value=""+String(val||"").replace(/"/g,"&quot;")+""></div>";
 }
-function editLN(i) {
-  const l=db.leads[i];
-  const n=prompt("Edit Customer Name:",l.n||""); if(n&&n.trim()) l.n=n.trim();
-  const p=prompt("Edit Phone:",l.phone||""); if(p!==null) l.phone=p.trim();
-  const it=prompt("Edit Interested In:",l.item||""); if(it!==null) l.item=it.trim();
-  const d=prompt("Edit Follow-up Date (YYYY-MM-DD):",l.d||""); if(d&&d.trim()) l.d=d.trim();
-  const b=prompt("Edit Est. Budget (Rs):",l.budget||""); if(b!==null&&!isNaN(b)) l.budget=parseFloat(b)||0;
-  const pr=prompt("Edit Priority (Hot/Warm/Cold):",l.priority||"Warm"); if(pr&&["Hot","Warm","Cold"].includes(pr)) l.priority=pr;
-  const nt=prompt("Edit Note:",l.note||""); if(nt!==null) l.note=nt;
-  saveDB();render();checkRem();
+function fgSel(lbl, id, val, opts) {
+  let s="<div class='fg'><label>"+lbl+"</label><select id='ef_"+id+"'>";
+  opts.forEach(o=>s+="<option"+(o===val?" selected":"")+">"+o+"</option>");
+  return s+"</select></div>";
 }
-function editON(i) {
-  const o=db.orders[i];
-  const n=prompt("Edit Customer Name:",o.n||""); if(n&&n.trim()) o.n=n.trim();
-  const p=prompt("Edit Phone:",o.phone||""); if(p!==null) o.phone=p.trim();
-  const it=prompt("Edit Item:",o.item||""); if(it!==null) o.item=it.trim();
-  const d=prompt("Edit Delivery Date (YYYY-MM-DD):",o.d||""); if(d&&d.trim()) o.d=d.trim();
-  const ad=prompt("Edit Delivery Address:",o.addr||""); if(ad!==null) o.addr=ad.trim();
-  const nt=prompt("Edit Note:",o.note||""); if(nt!==null) o.note=nt;
-  saveDB();render();checkRem();
+function fgTA(lbl, id, val) {
+  return "<div class='fg'><label>"+lbl+"</label><textarea id='ef_"+id+"'>"+String(val||"")+"</textarea></div>";
 }
-function editPN(i) {
-  const x=db.payments[i];
-  const n=prompt("Edit Customer Name:",x.n||""); if(n&&n.trim()) x.n=n.trim();
-  const p=prompt("Edit Phone:",x.phone||""); if(p!==null) x.phone=p.trim();
-  const am=prompt("Edit Amount Due (Rs):",x.a||""); if(am&&!isNaN(am)) x.a=parseFloat(am);
-  const d=prompt("Edit Due Date (YYYY-MM-DD):",x.d||""); if(d&&d.trim()) x.d=d.trim();
-  const nt=prompt("Edit Note:",x.note||""); if(nt!==null) x.note=nt;
-  saveDB();render();checkRem();
+function gef(id){ return (document.getElementById("ef_"+id)||{}).value||""; }
+
+function openEdit(type, idx) {
+  editCtx = {type, idx};
+  const ov=g("editOv"), box=g("editFields"), ttl=g("editTitle");
+  let html="";
+  if(type==="sales") {
+    const s=db.sales[idx]; ttl.innerText="Edit Sale";
+    html=fg("Customer Name","n",s.n)+fg("Phone","phone",s.phone,"tel")+fg("Item / Product","item",s.item)
+      +fg("Total Amount (Rs)","amt",s.amt,"number")+fg("Advance Paid (Rs)","adv",s.adv||0,"number")
+      +fg("Sale Date","date",s.date,"date")+fg("Payment Due Date","dueDate",s.dueDate,"date")
+      +fgSel("Payment Mode","mode",s.mode,["Cash","UPI","Card","Credit/EMI","Cheque","Mixed"])
+      +fgTA("Note","note",s.note);
+  } else if(type==="leads") {
+    const l=db.leads[idx]; ttl.innerText="Edit Lead";
+    html=fg("Customer Name","n",l.n)+fg("Phone","phone",l.phone,"tel")+fg("Interested In","item",l.item)
+      +fg("Follow-up Date","date",l.d,"date")+fg("Est. Budget (Rs)","budget",l.budget||0,"number")
+      +fgSel("Priority","priority",l.priority,["Hot","Warm","Cold"])
+      +fgSel("Source","source",l.source,["Walk-in","Referral","Social Media","Phone Enquiry","IM Lead","Other"])
+      +fgTA("Note","note",l.note);
+  } else if(type==="orders") {
+    const o=db.orders[idx]; ttl.innerText="Edit Order";
+    html=fg("Customer Name","n",o.n)+fg("Phone","phone",o.phone,"tel")+fg("Item","item",o.item)
+      +fg("Delivery Date","date",o.d,"date")+fg("Delivery Address","addr",o.addr)
+      +fg("Linked Bill No.","linkBill",o.linkBill)+fgTA("Note","note",o.note);
+  } else if(type==="payments") {
+    const x=db.payments[idx]; ttl.innerText="Edit Payment Due";
+    html=fg("Customer Name","n",x.n)+fg("Phone","phone",x.phone,"tel")
+      +fg("Amount Due (Rs)","amt",x.a,"number")+fg("Due Date","date",x.d,"date")
+      +fg("Bill / Ref No.","bill",x.bill)+fgTA("Note","note",x.note);
+  } else if(type==="expenses") {
+    const x=db.expenses[idx]; ttl.innerText="Edit Expense";
+    html=fgSel("Category","cat",x.cat,["Transport","Salary","Rent","Electricity","Stock Purchase","Maintenance","Marketing","Other"])
+      +fg("Amount (Rs)","amt",x.a,"number")+fg("Description","desc",x.desc)+fgTA("Note","note",x.note);
+  }
+  box.innerHTML=html;
+  ov.style.display="flex";
+  setTimeout(()=>ov.scrollTop=0,50);
 }
-function editEN(i) {
-  const x=db.expenses[i];
-  const ds=prompt("Edit Description:",x.desc||""); if(ds&&ds.trim()) x.desc=ds.trim();
-  const am=prompt("Edit Amount (Rs):",x.a||""); if(am&&!isNaN(am)) x.a=parseFloat(am);
-  const nt=prompt("Edit Note:",x.note||""); if(nt!==null) x.note=nt;
-  saveDB();render();
+
+function saveEdit() {
+  if(!editCtx) return;
+  const {type,idx}=editCtx;
+  if(type==="sales") {
+    const s=db.sales[idx];
+    const n=gef("n"); if(n) s.n=n;
+    s.phone=gef("phone");
+    s.item=gef("item");
+    const am=parseFloat(gef("amt")); if(!isNaN(am)&&am>0) s.amt=am;
+    const ad=parseFloat(gef("adv")); if(!isNaN(ad)) s.adv=ad;
+    s.date=gef("date")||s.date;
+    s.dueDate=gef("dueDate");
+    s.mode=gef("mode");
+    s.note=gef("note");
+  } else if(type==="leads") {
+    const l=db.leads[idx];
+    const n=gef("n"); if(n) l.n=n;
+    l.phone=gef("phone"); l.item=gef("item");
+    const d=gef("date"); if(d) l.d=d;
+    const b=parseFloat(gef("budget")); if(!isNaN(b)) l.budget=b;
+    l.priority=gef("priority"); l.source=gef("source"); l.note=gef("note");
+  } else if(type==="orders") {
+    const o=db.orders[idx];
+    const n=gef("n"); if(n) o.n=n;
+    o.phone=gef("phone"); o.item=gef("item");
+    const d=gef("date"); if(d) o.d=d;
+    o.addr=gef("addr"); o.linkBill=gef("linkBill"); o.note=gef("note");
+  } else if(type==="payments") {
+    const x=db.payments[idx];
+    const n=gef("n"); if(n) x.n=n;
+    x.phone=gef("phone");
+    const am=parseFloat(gef("amt")); if(!isNaN(am)&&am>0) x.a=am;
+    const d=gef("date"); if(d) x.d=d;
+    x.bill=gef("bill"); x.note=gef("note");
+  } else if(type==="expenses") {
+    const x=db.expenses[idx];
+    x.cat=gef("cat");
+    const am=parseFloat(gef("amt")); if(!isNaN(am)&&am>0) x.a=am;
+    x.desc=gef("desc"); x.note=gef("note");
+  }
+  closeEdit(); saveDB(); render(); checkRem();
 }
+
+function closeEdit() { g("editOv").style.display="none"; editCtx=null; }
+
+function editSN(i){ openEdit("sales",i); }
+function editLN(i){ openEdit("leads",i); }
+function editON(i){ openEdit("orders",i); }
+function editPN(i){ openEdit("payments",i); }
+function editEN(i){ openEdit("expenses",i); }
 
 // ================================================================
 // BILL & WHATSAPP
@@ -868,7 +989,7 @@ function render() {
       +(x.note?"<div class='note-chip'>"+esc(x.note)+"</div>":"")
       +"<div class='row-btn'>"
       +(x.phone?"<button class='btn btn-call' ontouchstart='callCust(\""+x.phone+"\")' onclick='callCust(\""+x.phone+"\")'>Call</button>":"")
-      +(x.phone?"<button class='btn btn-wa' ontouchstart='waCust(\""+x.phone+"\")' onclick='waCust(\""+x.phone+"\")'>WA</button>":"")
+      +(x.phone?"<button class='btn btn-wa' ontouchstart='waOrder("+ri+")' onclick='waOrder("+ri+")'>WA</button>":"")
       +(!x.done?"<button class='btn btn-done' ontouchstart='markOrderDone("+ri+")' onclick='markOrderDone("+ri+")'>Delivered</button>":"")
       +"<button class='btn btn-blue' ontouchstart='editON("+ri+")' onclick='editON("+ri+")'>Edit</button>"
       +"<button class='btn btn-del' ontouchstart='delItem(\"orders\","+ri+")' onclick='delItem(\"orders\","+ri+")'>Del</button>"
@@ -888,7 +1009,7 @@ function render() {
       +(x.note?"<div class='note-chip'>"+esc(x.note)+"</div>":"")
       +"<div class='row-btn'>"
       +(x.phone?"<button class='btn btn-call' ontouchstart='callCust(\""+x.phone+"\")' onclick='callCust(\""+x.phone+"\")'>Call</button>":"")
-      +(x.phone?"<button class='btn btn-wa' ontouchstart='waCust(\""+x.phone+"\")' onclick='waCust(\""+x.phone+"\")'>WA</button>":"")
+      +(x.phone?"<button class='btn btn-wa' ontouchstart='waPayment("+ri+")' onclick='waPayment("+ri+")'>WA</button>":"")
       +(!x.done?"<button class='btn btn-done' ontouchstart='markPayDone("+ri+")' onclick='markPayDone("+ri+")'>Mark Paid</button>":"")
       +"<button class='btn btn-blue' ontouchstart='editPN("+ri+")' onclick='editPN("+ri+")'>Edit</button>"
       +"<button class='btn btn-del' ontouchstart='delItem(\"payments\","+ri+")' onclick='delItem(\"payments\","+ri+")'>Del</button>"
@@ -988,7 +1109,7 @@ window.addSale=addSale;window.addLead=addLead;window.addOrder=addOrder;window.ad
 window.delItem=delItem;window.collectPayment=collectPayment;
 window.markOrderDone=markOrderDone;window.markPayDone=markPayDone;window.markLeadDone=markLeadDone;
 window.callCust=callCust;window.waCust=waCust;window.waFollowup=waFollowup;
-window.editSN=editSN;window.editLN=editLN;window.editON=editON;window.editPN=editPN;window.editEN=editEN;
+window.editSN=editSN;window.editLN=editLN;window.editON=editON;window.editPN=editPN;window.editEN=editEN;window.saveEdit=saveEdit;window.closeEdit=closeEdit;window.waOrder=waOrder;window.waPayment=waPayment;
 window.showBill=showBill;window.closeBill=closeBill;window.printBill=printBill;window.sendWABill=sendWABill;
 window.sendDailySummary=sendDailySummary;
 window.changePin=changePin;window.clearAll=clearAll;
