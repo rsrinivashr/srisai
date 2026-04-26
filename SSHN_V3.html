@@ -429,6 +429,65 @@ textarea{resize:vertical;min-height:50px;}
   </div>
 </div>
 
+<script>
+// PIN SYSTEM - runs immediately, not deferred like ES modules
+var _ADMIN_PIN = "1978";
+var _STAFF_PIN = "4328";
+var _pinEntry  = "";
+var _pinLock   = false;
+var _staffPinOverride = null;
+
+function pinKey(n) {
+  if (_pinLock) return;
+  _pinLock = true;
+  setTimeout(function(){ _pinLock = false; }, 350);
+  if (_pinEntry.length >= 4) return;
+  _pinEntry += String(n);
+  _updDots();
+  if (_pinEntry.length === 4) setTimeout(_checkPin, 200);
+}
+
+function pinDel() {
+  if (_pinLock) return;
+  _pinLock = true;
+  setTimeout(function(){ _pinLock = false; }, 350);
+  _pinEntry = _pinEntry.slice(0, -1);
+  _updDots();
+  document.getElementById("pinErr").innerText = "";
+}
+
+function _updDots() {
+  for (var i = 0; i < 4; i++) {
+    document.getElementById("d" + i).className = "pin-dot" + (i < _pinEntry.length ? " filled" : "");
+  }
+}
+
+function _checkPin() {
+  var effectiveStaffPin = _staffPinOverride || _STAFF_PIN;
+  if (_pinEntry === _ADMIN_PIN) {
+    isAdmin = true;
+    document.getElementById("pinScreen").style.display = "none";
+    document.getElementById("roleTag").style.display = "block";
+    document.getElementById("roleTag").innerText = "Admin Access";
+    document.getElementById("roleBar").innerText = "Logged in as: Admin";
+    if(document.getElementById("adminPanel"))
+      document.getElementById("adminPanel").style.display = "block";
+    if (typeof window._startFirebase === "function") window._startFirebase();
+  } else if (_pinEntry === effectiveStaffPin) {
+    isAdmin = false;
+    document.getElementById("pinScreen").style.display = "none";
+    document.getElementById("roleBar").innerText = "Logged in as: Staff";
+    if(document.getElementById("adminPanel"))
+      document.getElementById("adminPanel").style.display = "none";
+    if (typeof window._startFirebase === "function") window._startFirebase();
+  } else {
+    document.getElementById("pinErr").innerText = "Wrong PIN. Try again.";
+    _pinEntry = "";
+    _updDots();
+  }
+}
+</script>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
 import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
@@ -447,60 +506,12 @@ const dbF   = getFirestore(fbApp);
 const DOC   = doc(dbF, "srisai", "sshn_nostock");
 
 // ================================================================
-// PIN SYSTEM
-// ================================================================
-const ADMIN_PIN = "1978";
-const STAFF_PIN = "4328";
-let pinEntry  = "";
-let isAdmin   = false;
-let staffPin  = STAFF_PIN; // can be changed by admin - loaded from Firebase
+// PIN managed by global script tag above module
+// isAdmin and staffPin synced via isAdmin and window._staffPin
+let isAdmin  = false;
+let staffPin = "4328";
 
-let pinLock = false;
-function pinKey(n) {
-  if (pinLock) return;
-  pinLock = true;
-  setTimeout(() => pinLock = false, 300);
-  if (pinEntry.length >= 4) return;
-  pinEntry += String(n);
-  updDots();
-  if (pinEntry.length === 4) setTimeout(checkPin, 200);
-}
-function pinDel() {
-  if (pinLock) return;
-  pinLock = true;
-  setTimeout(() => pinLock = false, 300);
-  pinEntry = pinEntry.slice(0, -1);
-  updDots();
-  document.getElementById("pinErr").innerText = "";
-}
-function updDots() {
-  for (let i = 0; i < 4; i++) {
-    document.getElementById("d" + i).className = "pin-dot" + (i < pinEntry.length ? " filled" : "");
-  }
-}
-function checkPin() {
-  if (pinEntry === ADMIN_PIN) {
-    isAdmin = true;
-    document.getElementById("pinScreen").style.display = "none";
-    document.getElementById("roleTag").style.display = "block";
-    document.getElementById("roleTag").innerText = "Admin Access";
-    document.getElementById("roleBar").innerText = "Logged in as: Admin";
-    document.getElementById("adminPanel").style.display = "block";
-    startFirebase();
-  } else if (pinEntry === staffPin || pinEntry === STAFF_PIN) {
-    isAdmin = false;
-    document.getElementById("pinScreen").style.display = "none";
-    document.getElementById("roleBar").innerText = "Logged in as: Staff";
-    document.getElementById("adminPanel").style.display = "none";
-    startFirebase();
-  } else {
-    document.getElementById("pinErr").innerText = "Wrong PIN. Try again.";
-    pinEntry = "";
-    updDots();
-  }
-}
-window.pinKey = pinKey;
-window.pinDel = pinDel;
+// PIN functions handled by global script above
 
 // ================================================================
 // DATA
@@ -535,6 +546,9 @@ function saveDB() {
 }
 
 function startFirebase() {
+  isAdmin = window._isAdmin || false;
+  staffPin = window._staffPinOverride || "4328";
+  window._startFirebase = startFirebase;
   ss("Connecting...", "syncing");
   onSnapshot(DOC, snap => {
     if (snap.exists()) {
@@ -545,7 +559,7 @@ function startFirebase() {
       db.payments = p.payments || [];
       db.expenses = p.expenses || [];
       if (p.billCtr)  billCtr  = p.billCtr;
-      if (p.staffPin) staffPin = p.staffPin;
+      if (p.staffPin) { staffPin = p.staffPin; window._staffPin = p.staffPin; }
       ss("Synced at " + new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"}), "");
     } else {
       loadLocal();
@@ -565,13 +579,14 @@ function loadLocal() {
 function changePin() {
   if (!isAdmin) { alert("Admin access required."); return; }
   const cur = prompt("Enter your ADMIN PIN to confirm identity:");
-  if (cur !== ADMIN_PIN) { alert("Wrong Admin PIN. Cancelled."); return; }
+  if (cur !== "1978") { alert("Wrong Admin PIN. Cancelled."); return; }
   const np1 = prompt("Enter NEW Staff PIN (4 digits):");
   if (!np1 || np1.length !== 4 || isNaN(np1)) { alert("Invalid PIN. Must be exactly 4 digits."); return; }
-  if (np1 === ADMIN_PIN) { alert("Staff PIN cannot be same as Admin PIN."); return; }
+  if (np1 === "1978") { alert("Staff PIN cannot be same as Admin PIN."); return; }
   const np2 = prompt("Re-enter new Staff PIN to confirm:");
   if (np1 !== np2) { alert("PINs do not match. Cancelled."); return; }
   staffPin = np1;
+  window._staffPinOverride = np1;
   const pay = JSON.parse(JSON.stringify(db));
   pay.billCtr  = billCtr;
   pay.staffPin = staffPin;
@@ -1109,6 +1124,8 @@ function exportData() {
   const blob=new Blob([csv],{type:"text/csv"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="SSHN_"+TODAY+".csv";a.click();
 }
 
+// set startFirebase immediately so PIN script can call it
+window._startFirebase = startFirebase;
 // expose globals
 window.showTab=showTab;window.setSF=setSF;window.setLF=setLF;
 window.calcDue=calcDue;window.toggleDel=toggleDel;
