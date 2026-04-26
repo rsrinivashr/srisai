@@ -143,6 +143,64 @@ textarea{resize:vertical;min-height:50px;}
 .edit-actions{display:flex;gap:8px;margin-top:12px;}
 .edit-actions .btn{flex:1;padding:12px;font-size:13px;}
 </style>
+<script>
+// PIN SYSTEM - runs immediately, not deferred like ES modules
+var _ADMIN_PIN = "1978";
+var _STAFF_PIN = "4328";
+var _pinEntry  = "";
+var _pinLock   = false;
+var _staffPinOverride = null;
+
+function pinKey(n) {
+  if (_pinLock) return;
+  _pinLock = true;
+  setTimeout(function(){ _pinLock = false; }, 350);
+  if (_pinEntry.length >= 4) return;
+  _pinEntry += String(n);
+  _updDots();
+  if (_pinEntry.length === 4) setTimeout(_checkPin, 200);
+}
+
+function pinDel() {
+  if (_pinLock) return;
+  _pinLock = true;
+  setTimeout(function(){ _pinLock = false; }, 350);
+  _pinEntry = _pinEntry.slice(0, -1);
+  _updDots();
+  document.getElementById("pinErr").innerText = "";
+}
+
+function _updDots() {
+  for (var i = 0; i < 4; i++) {
+    document.getElementById("d" + i).className = "pin-dot" + (i < _pinEntry.length ? " filled" : "");
+  }
+}
+
+function _checkPin() {
+  var effectiveStaffPin = _staffPinOverride || _STAFF_PIN;
+  if (_pinEntry === _ADMIN_PIN) {
+    isAdmin = true;
+    document.getElementById("pinScreen").style.display = "none";
+    document.getElementById("roleTag").style.display = "block";
+    document.getElementById("roleTag").innerText = "Admin Access";
+    document.getElementById("roleBar").innerText = "Logged in as: Admin";
+    if(document.getElementById("adminPanel"))
+      document.getElementById("adminPanel").style.display = "block";
+    if (typeof window._startFirebase === "function") window._startFirebase();
+  } else if (_pinEntry === effectiveStaffPin) {
+    isAdmin = false;
+    document.getElementById("pinScreen").style.display = "none";
+    document.getElementById("roleBar").innerText = "Logged in as: Staff";
+    if(document.getElementById("adminPanel"))
+      document.getElementById("adminPanel").style.display = "none";
+    if (typeof window._startFirebase === "function") window._startFirebase();
+  } else {
+    document.getElementById("pinErr").innerText = "Wrong PIN. Try again.";
+    _pinEntry = "";
+    _updDots();
+  }
+}
+</script>
 </head>
 <body>
 
@@ -429,64 +487,7 @@ textarea{resize:vertical;min-height:50px;}
   </div>
 </div>
 
-<script>
-// PIN SYSTEM - runs immediately, not deferred like ES modules
-var _ADMIN_PIN = "1978";
-var _STAFF_PIN = "4328";
-var _pinEntry  = "";
-var _pinLock   = false;
-var _staffPinOverride = null;
 
-function pinKey(n) {
-  if (_pinLock) return;
-  _pinLock = true;
-  setTimeout(function(){ _pinLock = false; }, 350);
-  if (_pinEntry.length >= 4) return;
-  _pinEntry += String(n);
-  _updDots();
-  if (_pinEntry.length === 4) setTimeout(_checkPin, 200);
-}
-
-function pinDel() {
-  if (_pinLock) return;
-  _pinLock = true;
-  setTimeout(function(){ _pinLock = false; }, 350);
-  _pinEntry = _pinEntry.slice(0, -1);
-  _updDots();
-  document.getElementById("pinErr").innerText = "";
-}
-
-function _updDots() {
-  for (var i = 0; i < 4; i++) {
-    document.getElementById("d" + i).className = "pin-dot" + (i < _pinEntry.length ? " filled" : "");
-  }
-}
-
-function _checkPin() {
-  var effectiveStaffPin = _staffPinOverride || _STAFF_PIN;
-  if (_pinEntry === _ADMIN_PIN) {
-    isAdmin = true;
-    document.getElementById("pinScreen").style.display = "none";
-    document.getElementById("roleTag").style.display = "block";
-    document.getElementById("roleTag").innerText = "Admin Access";
-    document.getElementById("roleBar").innerText = "Logged in as: Admin";
-    if(document.getElementById("adminPanel"))
-      document.getElementById("adminPanel").style.display = "block";
-    if (typeof window._startFirebase === "function") window._startFirebase();
-  } else if (_pinEntry === effectiveStaffPin) {
-    isAdmin = false;
-    document.getElementById("pinScreen").style.display = "none";
-    document.getElementById("roleBar").innerText = "Logged in as: Staff";
-    if(document.getElementById("adminPanel"))
-      document.getElementById("adminPanel").style.display = "none";
-    if (typeof window._startFirebase === "function") window._startFirebase();
-  } else {
-    document.getElementById("pinErr").innerText = "Wrong PIN. Try again.";
-    _pinEntry = "";
-    _updDots();
-  }
-}
-</script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
