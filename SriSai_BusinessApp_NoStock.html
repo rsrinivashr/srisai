@@ -769,10 +769,10 @@ ${x.note?`<div class="note-chip">${esc(x.note)}</div>`:""}
 
 function checkRem(){
   let due2=[];
-  db.leads.forEach(x=>{if(!x.done&&x.d<=TODAY)due2.push((x.d<TODAY?"OVERDUE - ":"Today - ")+"Lead: "+x.n+(x.phone?" ("+x.phone+")")+(x.item?" - "+x.item:"")+" | "+x.d);});
-  db.orders.forEach(x=>{if(!x.done&&x.d<=TODAY)due2.push((x.d<TODAY?"OVERDUE - ":"Today - ")+"Delivery: "+x.n+(x.phone?" ("+x.phone+")")+(x.item?" - "+x.item:"")+" | "+x.d);});
-  db.sales.forEach(x=>{if(stOf(x)!=="closed"&&x.dueDate&&x.dueDate<=TODAY)due2.push((x.dueDate<TODAY?"OVERDUE - ":"Today - ")+"Payment: "+x.n+" Rs."+due(x).toFixed(2)+(x.phone?" ("+x.phone+")")+" | "+x.dueDate);});
-  db.payments.forEach(x=>{if(!x.done&&x.d<=TODAY)due2.push((x.d<TODAY?"OVERDUE - ":"Today - ")+"Due: "+x.n+" Rs."+x.a+(x.phone?" ("+x.phone+")")+" | "+x.d);});
+  db.leads.forEach(x=>{if(!x.done&&x.d<=TODAY)due2.push((x.d<TODAY?"OVERDUE - ":"Today - ")+"Lead: "+x.n+(x.phone?" ("+x.phone+")":"")+(x.item?" - "+x.item:"")+" | "+x.d);});
+  db.orders.forEach(x=>{if(!x.done&&x.d<=TODAY)due2.push((x.d<TODAY?"OVERDUE - ":"Today - ")+"Delivery: "+x.n+(x.phone?" ("+x.phone+")":"")+(x.item?" - "+x.item:"")+" | "+x.d);});
+  db.sales.forEach(x=>{if(stOf(x)!=="closed"&&x.dueDate&&x.dueDate<=TODAY)due2.push((x.dueDate<TODAY?"OVERDUE - ":"Today - ")+"Payment: "+x.n+" Rs."+due(x).toFixed(2)+(x.phone?" ("+x.phone+")":"")+" | "+x.dueDate);});
+  db.payments.forEach(x=>{if(!x.done&&x.d<=TODAY)due2.push((x.d<TODAY?"OVERDUE - ":"Today - ")+"Due: "+x.n+" Rs."+x.a+(x.phone?" ("+x.phone+")":"")+" | "+x.d);});
   if(due2.length){g("remList").innerHTML=due2.map(d=>`<li>${d}</li>`).join("");g("remOv").style.display="flex";}
   else g("remOv").style.display="none";
 }
