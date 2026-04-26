@@ -18,7 +18,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;ba
 .pin-dot{width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,.25);transition:background .2s;}
 .pin-dot.filled{background:#fff;}
 .pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:240px;}
-.pin-btn{background:rgba(255,255,255,.12);border:none;border-radius:12px;color:#fff;font-size:22px;font-weight:700;padding:18px;cursor:pointer;font-family:inherit;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;}
+.pin-btn{background:rgba(255,255,255,.12);border:none;border-radius:12px;color:#fff;font-size:22px;font-weight:700;padding:18px;cursor:pointer;font-family:inherit;touch-action:manipulation;}
 .pin-btn:active{background:rgba(255,255,255,.28);}
 .pin-btn.del{background:rgba(231,76,60,.35);}
 .pin-btn.zero{grid-column:2;}
@@ -144,60 +144,41 @@ textarea{resize:vertical;min-height:50px;}
 .edit-actions .btn{flex:1;padding:12px;font-size:13px;}
 </style>
 <script>
-// PIN SYSTEM - runs immediately, not deferred like ES modules
-var _ADMIN_PIN = "1978";
-var _STAFF_PIN = "4328";
-var _pinEntry  = "";
-var _pinLock   = false;
-var _staffPinOverride = null;
-
-function pinKey(n) {
-  if (_pinLock) return;
-  _pinLock = true;
-  setTimeout(function(){ _pinLock = false; }, 350);
-  if (_pinEntry.length >= 4) return;
-  _pinEntry += String(n);
-  _updDots();
-  if (_pinEntry.length === 4) setTimeout(_checkPin, 200);
+// PIN stubs - work immediately before module loads
+var _pe="",_pl=false,_pa="1978",_ps="4328",_pso=null;
+function pinKey(n){
+  if(_pl)return;_pl=true;setTimeout(function(){_pl=false;},350);
+  if(_pe.length>=4)return;
+  _pe+=String(n);
+  for(var i=0;i<4;i++)document.getElementById("d"+i).className="pin-dot"+(i<_pe.length?" filled":"");
+  if(_pe.length===4)setTimeout(_chk,200);
 }
-
-function pinDel() {
-  if (_pinLock) return;
-  _pinLock = true;
-  setTimeout(function(){ _pinLock = false; }, 350);
-  _pinEntry = _pinEntry.slice(0, -1);
-  _updDots();
-  document.getElementById("pinErr").innerText = "";
+function pinDel(){
+  if(_pl)return;_pl=true;setTimeout(function(){_pl=false;},350);
+  _pe=_pe.slice(0,-1);
+  for(var i=0;i<4;i++)document.getElementById("d"+i).className="pin-dot"+(i<_pe.length?" filled":"");
+  document.getElementById("pinErr").innerText="";
 }
-
-function _updDots() {
-  for (var i = 0; i < 4; i++) {
-    document.getElementById("d" + i).className = "pin-dot" + (i < _pinEntry.length ? " filled" : "");
-  }
-}
-
-function _checkPin() {
-  var effectiveStaffPin = _staffPinOverride || _STAFF_PIN;
-  if (_pinEntry === _ADMIN_PIN) {
-    isAdmin = true;
-    document.getElementById("pinScreen").style.display = "none";
-    document.getElementById("roleTag").style.display = "block";
-    document.getElementById("roleTag").innerText = "Admin Access";
-    document.getElementById("roleBar").innerText = "Logged in as: Admin";
-    if(document.getElementById("adminPanel"))
-      document.getElementById("adminPanel").style.display = "block";
-    if (typeof window._startFirebase === "function") window._startFirebase();
-  } else if (_pinEntry === effectiveStaffPin) {
-    isAdmin = false;
-    document.getElementById("pinScreen").style.display = "none";
-    document.getElementById("roleBar").innerText = "Logged in as: Staff";
-    if(document.getElementById("adminPanel"))
-      document.getElementById("adminPanel").style.display = "none";
-    if (typeof window._startFirebase === "function") window._startFirebase();
+function _chk(){
+  var sp=_pso||_ps;
+  if(_pe===_pa){
+    window._isAdmin=true;
+    document.getElementById("pinScreen").style.display="none";
+    document.getElementById("roleTag").style.display="block";
+    document.getElementById("roleTag").innerText="Admin Access";
+    document.getElementById("roleBar").innerText="Logged in as: Admin";
+    var ap=document.getElementById("adminPanel");if(ap)ap.style.display="block";
+    if(window._fbStart)window._fbStart();
+  } else if(_pe===sp){
+    window._isAdmin=false;
+    document.getElementById("pinScreen").style.display="none";
+    document.getElementById("roleBar").innerText="Logged in as: Staff";
+    var ap=document.getElementById("adminPanel");if(ap)ap.style.display="none";
+    if(window._fbStart)window._fbStart();
   } else {
-    document.getElementById("pinErr").innerText = "Wrong PIN. Try again.";
-    _pinEntry = "";
-    _updDots();
+    document.getElementById("pinErr").innerText="Wrong PIN. Try again.";
+    _pe="";
+    for(var i=0;i<4;i++)document.getElementById("d"+i).className="pin-dot";
   }
 }
 </script>
@@ -257,8 +238,8 @@ function _checkPin() {
   <div class="card"><div class="card-title">&#128276; Today Follow-ups</div><div id="todayFU"></div></div>
   <div class="card"><div class="card-title">&#9888; Overdue Payments</div><div id="overduePay"></div></div>
   <div class="card"><div class="card-title">&#128202; Quick Summary</div><div id="quickSummary" style="font-size:12px;line-height:2;"></div></div>
-  <button class="btn btn-sum" onclick="sendDailySummary()">&#128245; Send Today Summary via WhatsApp</button>
-  <button class="btn btn-exp" style="margin-top:8px;" onclick="exportData()">&#128229; Export Report to Excel</button>
+  <button class="btn btn-sum" ontouchstart="sendDailySummary()" onclick="sendDailySummary()">&#128245; Send Today Summary via WhatsApp</button>
+  <button class="btn btn-exp" style="margin-top:8px;" ontouchstart="exportData()" onclick="exportData()">&#128229; Export Report to Excel</button>
 </div>
 
 <!-- SALES -->
@@ -300,13 +281,13 @@ function _checkPin() {
       <div class="fg"><label>Delivery Address</label><input id="sDelAddr" placeholder="Full delivery address"></div>
     </div>
     <div class="fg"><label>Note</label><textarea id="sNote" placeholder="Any remarks..."></textarea></div>
-    <button class="btn btn-save" onclick="addSale()">Save Sale</button>
+    <button class="btn btn-save" ontouchstart="addSale()" onclick="addSale()">Save Sale</button>
   </div>
   <div class="filter-pills">
-    <button class="pill on" id="fp-all"     onclick="setSF('all',this)">All</button>
-    <button class="pill"    id="fp-inprog"  onclick="setSF('inprog',this)">In-Progress</button>
-    <button class="pill"    id="fp-closed"  onclick="setSF('closed',this)">Closed</button>
-    <button class="pill"    id="fp-overdue" onclick="setSF('overdue',this)">Overdue</button>
+    <button class="pill on" id="fp-all"     ontouchstart="setSF('all',this)"     onclick="setSF('all',this)">All</button>
+    <button class="pill"    id="fp-inprog"  ontouchstart="setSF('inprog',this)"  onclick="setSF('inprog',this)">In-Progress</button>
+    <button class="pill"    id="fp-closed"  ontouchstart="setSF('closed',this)"  onclick="setSF('closed',this)">Closed</button>
+    <button class="pill"    id="fp-overdue" ontouchstart="setSF('overdue',this)" onclick="setSF('overdue',this)">Overdue</button>
   </div>
   <div class="sw"><span class="si">&#128269;</span><input id="searchSales" placeholder="Search sales..." oninput="render()"></div>
   <div class="sum-row">Showing: <span id="sScount">0</span> &nbsp;|&nbsp; Total: &#8377;<span id="sSamt">0</span> &nbsp;|&nbsp; Due: &#8377;<span id="sSDue">0</span></div>
@@ -336,14 +317,14 @@ function _checkPin() {
       <select id="lPriority"><option value="Hot">Hot</option><option value="Warm" selected>Warm</option><option value="Cold">Cold</option></select>
     </div>
     <div class="fg"><label>Note</label><textarea id="lNote" placeholder="Any remarks..."></textarea></div>
-    <button class="btn btn-save" onclick="addLead()">Save Lead</button>
+    <button class="btn btn-save" ontouchstart="addLead()" onclick="addLead()">Save Lead</button>
   </div>
   <div class="filter-pills">
-    <button class="pill on" id="lf-all"  onclick="setLF('all',this)">All</button>
-    <button class="pill"    id="lf-hot"  onclick="setLF('Hot',this)">Hot</button>
-    <button class="pill"    id="lf-warm" onclick="setLF('Warm',this)">Warm</button>
-    <button class="pill"    id="lf-cold" onclick="setLF('Cold',this)">Cold</button>
-    <button class="pill"    id="lf-due"  onclick="setLF('due',this)">Due Today</button>
+    <button class="pill on" id="lf-all"  ontouchstart="setLF('all',this)"  onclick="setLF('all',this)">All</button>
+    <button class="pill"    id="lf-hot"  ontouchstart="setLF('Hot',this)"  onclick="setLF('Hot',this)">Hot</button>
+    <button class="pill"    id="lf-warm" ontouchstart="setLF('Warm',this)" onclick="setLF('Warm',this)">Warm</button>
+    <button class="pill"    id="lf-cold" ontouchstart="setLF('Cold',this)" onclick="setLF('Cold',this)">Cold</button>
+    <button class="pill"    id="lf-due"  ontouchstart="setLF('due',this)"  onclick="setLF('due',this)">Due Today</button>
   </div>
   <div class="sw"><span class="si">&#128269;</span><input id="searchLeads" placeholder="Search leads..." oninput="render()"></div>
   <div id="leadList"></div>
@@ -362,7 +343,7 @@ function _checkPin() {
     <div class="fg"><label>Delivery Address</label><input id="oAddr" placeholder="Full delivery address"></div>
     <div class="fg"><label>Linked Bill No.</label><input id="oLinkBill" placeholder="e.g. INV-001"></div>
     <div class="fg"><label>Note</label><textarea id="oNote" placeholder="Any delivery instructions..."></textarea></div>
-    <button class="btn btn-save" onclick="addOrder()">Save Order</button>
+    <button class="btn btn-save" ontouchstart="addOrder()" onclick="addOrder()">Save Order</button>
   </div>
   <div class="sw"><span class="si">&#128269;</span><input id="searchOrders" placeholder="Search orders..." oninput="render()"></div>
   <div id="orderList"></div>
@@ -387,7 +368,7 @@ function _checkPin() {
       <div class="fg"><label>Bill / Ref No.</label><input id="pBill" placeholder="Reference"></div>
     </div>
     <div class="fg"><label>Note</label><textarea id="pNote" placeholder="Any remarks..."></textarea></div>
-    <button class="btn btn-save" onclick="addPayment()">Save Payment Due</button>
+    <button class="btn btn-save" ontouchstart="addPayment()" onclick="addPayment()">Save Payment Due</button>
   </div>
   <div class="sw"><span class="si">&#128269;</span><input id="searchPay" placeholder="Search payments..." oninput="render()"></div>
   <div class="sum-row">Standalone Pending: &#8377;<span id="payPendTot">0</span></div>
@@ -409,7 +390,7 @@ function _checkPin() {
     </div>
     <div class="fg"><label>Description *</label><input id="eDesc" placeholder="e.g. Auto fare, Staff salary"></div>
     <div class="fg"><label>Note</label><textarea id="eNote" placeholder="Optional details..."></textarea></div>
-    <button class="btn btn-save" onclick="addExpense()">Save Expense</button>
+    <button class="btn btn-save" ontouchstart="addExpense()" onclick="addExpense()">Save Expense</button>
   </div>
   <div class="sw"><span class="si">&#128269;</span><input id="searchExp" placeholder="Search expenses..." oninput="render()"></div>
   <div class="sum-row">Total shown: &#8377;<span id="expTot">0</span></div>
@@ -424,18 +405,18 @@ function _checkPin() {
       <div class="fg"><label>From</label><input type="date" id="repFrom"></div>
       <div class="fg"><label>To</label><input type="date" id="repTo"></div>
     </div>
-    <button class="btn btn-save" style="background:var(--blue);" onclick="genReport()">Generate Report</button>
+    <button class="btn btn-save" style="background:var(--blue);" ontouchstart="genReport()" onclick="genReport()">Generate Report</button>
   </div>
   <div id="reportOut"></div>
-  <button class="btn btn-exp" onclick="exportData()" style="margin-top:6px;">&#128229; Export All Data to Excel</button>
+  <button class="btn btn-exp" ontouchstart="exportData()" onclick="exportData()" style="margin-top:6px;">&#128229; Export All Data to Excel</button>
 
   <!-- ADMIN ONLY SECTION -->
   <div id="adminPanel" style="display:none;">
     <div class="admin-box" style="margin-top:10px;">
       <div class="card-title">&#128274; Admin Controls</div>
       <p style="font-size:11px;color:var(--muted);margin-bottom:10px;">These options are only visible to Admin.</p>
-      <button class="btn btn-admin" onclick="changePin()">&#128273; Change Staff PIN</button>
-      <button class="btn btn-clr" onclick="clearAll()">&#128465; Clear ALL Data</button>
+      <button class="btn btn-admin" ontouchstart="changePin()" onclick="changePin()">&#128273; Change Staff PIN</button>
+      <button class="btn btn-clr" ontouchstart="clearAll()" onclick="clearAll()">&#128465; Clear ALL Data</button>
     </div>
   </div>
 </div>
@@ -448,21 +429,21 @@ function _checkPin() {
     <h3 id="editTitle">Edit Record</h3>
     <div id="editFields"></div>
     <div class="edit-actions">
-      <button class="btn btn-save" onclick="saveEdit()">Save Changes</button>
-      <button class="btn" style="background:var(--muted);" onclick="closeEdit()">Cancel</button>
+      <button class="btn btn-save" ontouchstart="saveEdit()" onclick="saveEdit()">Save Changes</button>
+      <button class="btn" style="background:var(--muted);" ontouchstart="closeEdit()" onclick="closeEdit()">Cancel</button>
     </div>
   </div>
 </div>
 
 <!-- TABS -->
 <div class="tabs">
-  <button onclick="showTab('home',this)" class="active"><span class="ti">&#127968;</span>Home</button>
-  <button onclick="showTab('sales',this)"><span class="ti">&#128176;</span>Sales</button>
-  <button onclick="showTab('leads',this)"><span class="ti">&#128203;</span>Leads</button>
-  <button onclick="showTab('orders',this)"><span class="ti">&#128230;</span>Orders</button>
-  <button onclick="showTab('payments',this)"><span class="ti">&#128184;</span>Pay</button>
-  <button onclick="showTab('expenses',this)"><span class="ti">&#129534;</span>Expense</button>
-  <button onclick="showTab('reports',this)"><span class="ti">&#128202;</span>Reports</button>
+  <button ontouchstart="showTab('home',this)" onclick="showTab('home',this)" class="active"><span class="ti">&#127968;</span>Home</button>
+  <button ontouchstart="showTab('sales',this)" onclick="showTab('sales',this)"><span class="ti">&#128176;</span>Sales</button>
+  <button ontouchstart="showTab('leads',this)" onclick="showTab('leads',this)"><span class="ti">&#128203;</span>Leads</button>
+  <button ontouchstart="showTab('orders',this)" onclick="showTab('orders',this)"><span class="ti">&#128230;</span>Orders</button>
+  <button ontouchstart="showTab('payments',this)" onclick="showTab('payments',this)"><span class="ti">&#128184;</span>Pay</button>
+  <button ontouchstart="showTab('expenses',this)" onclick="showTab('expenses',this)"><span class="ti">&#129534;</span>Expense</button>
+  <button ontouchstart="showTab('reports',this)" onclick="showTab('reports',this)"><span class="ti">&#128202;</span>Reports</button>
 </div>
 
 <!-- REMINDER -->
@@ -480,14 +461,12 @@ function _checkPin() {
   <div id="billBox">
     <div id="billContent"></div>
     <div class="bill-actions">
-      <button class="btn btn-wa"   onclick="sendWABill()">&#128245; WA Bill</button>
-      <button class="btn btn-blue" onclick="printBill()">&#128424; Print</button>
-      <button class="btn" style="background:var(--muted);" onclick="closeBill()">Close</button>
+      <button class="btn btn-wa"   ontouchstart="sendWABill()" onclick="sendWABill()">&#128245; WA Bill</button>
+      <button class="btn btn-blue" ontouchstart="printBill()"  onclick="printBill()">&#128424; Print</button>
+      <button class="btn" style="background:var(--muted);" ontouchstart="closeBill()" onclick="closeBill()">Close</button>
     </div>
   </div>
 </div>
-
-
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
@@ -507,12 +486,14 @@ const dbF   = getFirestore(fbApp);
 const DOC   = doc(dbF, "srisai", "sshn_nostock");
 
 // ================================================================
-// PIN managed by global script tag above module
-// isAdmin and staffPin synced via isAdmin and window._staffPin
-let isAdmin  = false;
+// PIN SYSTEM
+// ================================================================
+let isAdmin = false;
 let staffPin = "4328";
 
-// PIN functions handled by global script above
+// PIN handled by global stub in <head>
+
+
 
 // ================================================================
 // DATA
@@ -547,9 +528,9 @@ function saveDB() {
 }
 
 function startFirebase() {
+  window._fbStart = null; // already running
   isAdmin = window._isAdmin || false;
-  staffPin = window._staffPinOverride || "4328";
-  window._startFirebase = startFirebase;
+  staffPin = window._pso || "4328";
   ss("Connecting...", "syncing");
   onSnapshot(DOC, snap => {
     if (snap.exists()) {
@@ -560,7 +541,7 @@ function startFirebase() {
       db.payments = p.payments || [];
       db.expenses = p.expenses || [];
       if (p.billCtr)  billCtr  = p.billCtr;
-      if (p.staffPin) { staffPin = p.staffPin; window._staffPin = p.staffPin; }
+      if (p.staffPin) staffPin = p.staffPin;
       ss("Synced at " + new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"}), "");
     } else {
       loadLocal();
@@ -587,7 +568,7 @@ function changePin() {
   const np2 = prompt("Re-enter new Staff PIN to confirm:");
   if (np1 !== np2) { alert("PINs do not match. Cancelled."); return; }
   staffPin = np1;
-  window._staffPinOverride = np1;
+  window._pso = np1;
   const pay = JSON.parse(JSON.stringify(db));
   pay.billCtr  = billCtr;
   pay.staffPin = staffPin;
@@ -959,12 +940,12 @@ function render() {
       +(x.delivery?"<div class='rec-sub'>Delivery: "+(x.delDate||"TBD")+(x.delAddr?" - "+esc(x.delAddr):"")+"</div>":"")
       +(x.note?"<div class='note-chip'>"+esc(x.note)+"</div>":"")
       +"<div class='row-btn'>"
-      +(x.phone?"<button class='btn btn-call' onclick='callCust(\""+x.phone+"\")'>Call</button>":"")
-      +(x.phone?"<button class='btn btn-wa' onclick='waCust(\""+x.phone+"\")'>WA</button>":"")
-      +"<button class='btn btn-blue' onclick='showBill("+ri+")'>Bill</button>"
-      +(st!=="closed"?"<button class='btn btn-done' onclick='collectPayment("+ri+")'>Collect</button>":"")
-      +"<button class='btn btn-blue' onclick='editSN("+ri+")'>Edit</button>"
-      +"<button class='btn btn-del' onclick='delItem(\"sales\","+ri+")'>Del</button>"
+      +(x.phone?"<button class='btn btn-call' ontouchstart='callCust(\""+x.phone+"\")' onclick='callCust(\""+x.phone+"\")'>Call</button>":"")
+      +(x.phone?"<button class='btn btn-wa' ontouchstart='waCust(\""+x.phone+"\")' onclick='waCust(\""+x.phone+"\")'>WA</button>":"")
+      +"<button class='btn btn-blue' ontouchstart='showBill("+ri+")' onclick='showBill("+ri+")'>Bill</button>"
+      +(st!=="closed"?"<button class='btn btn-done' ontouchstart='collectPayment("+ri+")' onclick='collectPayment("+ri+")'>Collect</button>":"")
+      +"<button class='btn btn-blue' ontouchstart='editSN("+ri+")' onclick='editSN("+ri+")'>Edit</button>"
+      +"<button class='btn btn-del' ontouchstart='delItem(\"sales\","+ri+")' onclick='delItem(\"sales\","+ri+")'>Del</button>"
       +"</div></div>";
   });
   g("salesList").innerHTML=salHtml||"<div class='empty'><div class='ei'>&#128176;</div>No sales found</div>";
@@ -975,7 +956,7 @@ function render() {
   let adHtml=adArr.length===0?"<div style='font-size:12px;color:var(--green);padding:7px 0;'>No pending dues from sales!</div>":"";
   adArr.forEach(x=>{
     const ri=db.sales.indexOf(x),d=due(x);
-    adHtml+="<div style='padding:7px 0;border-bottom:1px solid #ecf0f1;font-size:12px;'><b>"+esc(x.n)+"</b>"+(x.bill?" #"+x.bill:"")+" - Rs."+d.toFixed(2)+(x.dueDate?" | Due: "+x.dueDate+dateBadge(x.dueDate):"")+(x.phone?"<br><a href='tel:"+x.phone+"' style='color:var(--orange);font-weight:700;'>"+x.phone+"</a>":"")+"<br><button class='btn btn-done' style='padding:4px 9px;font-size:11px;margin-top:5px;' onclick='collectPayment("+ri+")'>Collect</button>"+(x.phone?" <button class='btn btn-wa' style='padding:4px 8px;font-size:11px;margin-top:5px;' onclick='waCust(\""+x.phone+"\")'>WA</button>":"")+"</div>";
+    adHtml+="<div style='padding:7px 0;border-bottom:1px solid #ecf0f1;font-size:12px;'><b>"+esc(x.n)+"</b>"+(x.bill?" #"+x.bill:"")+" - Rs."+d.toFixed(2)+(x.dueDate?" | Due: "+x.dueDate+dateBadge(x.dueDate):"")+(x.phone?"<br><a href='tel:"+x.phone+"' style='color:var(--orange);font-weight:700;'>"+x.phone+"</a>":"")+"<br><button class='btn btn-done' style='padding:4px 9px;font-size:11px;margin-top:5px;' ontouchstart='collectPayment("+ri+")' onclick='collectPayment("+ri+")'>Collect</button>"+(x.phone?" <button class='btn btn-wa' style='padding:4px 8px;font-size:11px;margin-top:5px;' ontouchstart='waCust(\""+x.phone+"\")' onclick='waCust(\""+x.phone+"\")'>WA</button>":"")+"</div>";
   });
   g("autoDueList").innerHTML=adHtml;
 
@@ -991,11 +972,11 @@ function render() {
       +(x.source?"<div class='rec-sub'>Source: "+x.source+"</div>":"")
       +(x.note?"<div class='note-chip'>"+esc(x.note)+"</div>":"")
       +"<div class='row-btn'>"
-      +(x.phone?"<button class='btn btn-call' onclick='callCust(\""+x.phone+"\")'>Call</button>":"")
-      +(x.phone?"<button class='btn btn-wa' onclick='waFollowup("+ri+")'>WA Follow-up</button>":"")
-      +"<button class='btn btn-blue' onclick='editLN("+ri+")'>Edit</button>"
-      +"<button class='btn btn-done' onclick='markLeadDone("+ri+")'>Done</button>"
-      +"<button class='btn btn-del' onclick='delItem(\"leads\","+ri+")'>Del</button>"
+      +(x.phone?"<button class='btn btn-call' ontouchstart='callCust(\""+x.phone+"\")' onclick='callCust(\""+x.phone+"\")'>Call</button>":"")
+      +(x.phone?"<button class='btn btn-wa' ontouchstart='waFollowup("+ri+")' onclick='waFollowup("+ri+")'>WA Follow-up</button>":"")
+      +"<button class='btn btn-blue' ontouchstart='editLN("+ri+")' onclick='editLN("+ri+")'>Edit</button>"
+      +"<button class='btn btn-done' ontouchstart='markLeadDone("+ri+")' onclick='markLeadDone("+ri+")'>Done</button>"
+      +"<button class='btn btn-del' ontouchstart='delItem(\"leads\","+ri+")' onclick='delItem(\"leads\","+ri+")'>Del</button>"
       +"</div></div>";
   });
   g("leadList").innerHTML=ledHtml||"<div class='empty'><div class='ei'>&#128203;</div>No leads found</div>";
@@ -1011,11 +992,11 @@ function render() {
       +(x.linkBill?"<div class='order-tag'>Linked: "+x.linkBill+"</div>":"")
       +(x.note?"<div class='note-chip'>"+esc(x.note)+"</div>":"")
       +"<div class='row-btn'>"
-      +(x.phone?"<button class='btn btn-call' onclick='callCust(\""+x.phone+"\")'>Call</button>":"")
-      +(x.phone?"<button class='btn btn-wa' onclick='waOrder("+ri+")'>WA</button>":"")
-      +(!x.done?"<button class='btn btn-done' onclick='markOrderDone("+ri+")'>Delivered</button>":"")
-      +"<button class='btn btn-blue' onclick='editON("+ri+")'>Edit</button>"
-      +"<button class='btn btn-del' onclick='delItem(\"orders\","+ri+")'>Del</button>"
+      +(x.phone?"<button class='btn btn-call' ontouchstart='callCust(\""+x.phone+"\")' onclick='callCust(\""+x.phone+"\")'>Call</button>":"")
+      +(x.phone?"<button class='btn btn-wa' ontouchstart='waOrder("+ri+")' onclick='waOrder("+ri+")'>WA</button>":"")
+      +(!x.done?"<button class='btn btn-done' ontouchstart='markOrderDone("+ri+")' onclick='markOrderDone("+ri+")'>Delivered</button>":"")
+      +"<button class='btn btn-blue' ontouchstart='editON("+ri+")' onclick='editON("+ri+")'>Edit</button>"
+      +"<button class='btn btn-del' ontouchstart='delItem(\"orders\","+ri+")' onclick='delItem(\"orders\","+ri+")'>Del</button>"
       +"</div></div>";
   });
   g("orderList").innerHTML=ordHtml||"<div class='empty'><div class='ei'>&#128230;</div>No orders yet</div>";
@@ -1031,11 +1012,11 @@ function render() {
       +"<div class='rec-sub'>Rs."+x.a.toFixed(2)+" | Due: "+x.d+(x.bill?" | #"+x.bill:"")+(x.phone?" | "+x.phone:"")+"</div>"
       +(x.note?"<div class='note-chip'>"+esc(x.note)+"</div>":"")
       +"<div class='row-btn'>"
-      +(x.phone?"<button class='btn btn-call' onclick='callCust(\""+x.phone+"\")'>Call</button>":"")
-      +(x.phone?"<button class='btn btn-wa' onclick='waPayment("+ri+")'>WA</button>":"")
-      +(!x.done?"<button class='btn btn-done' onclick='markPayDone("+ri+")'>Mark Paid</button>":"")
-      +"<button class='btn btn-blue' onclick='editPN("+ri+")'>Edit</button>"
-      +"<button class='btn btn-del' onclick='delItem(\"payments\","+ri+")'>Del</button>"
+      +(x.phone?"<button class='btn btn-call' ontouchstart='callCust(\""+x.phone+"\")' onclick='callCust(\""+x.phone+"\")'>Call</button>":"")
+      +(x.phone?"<button class='btn btn-wa' ontouchstart='waPayment("+ri+")' onclick='waPayment("+ri+")'>WA</button>":"")
+      +(!x.done?"<button class='btn btn-done' ontouchstart='markPayDone("+ri+")' onclick='markPayDone("+ri+")'>Mark Paid</button>":"")
+      +"<button class='btn btn-blue' ontouchstart='editPN("+ri+")' onclick='editPN("+ri+")'>Edit</button>"
+      +"<button class='btn btn-del' ontouchstart='delItem(\"payments\","+ri+")' onclick='delItem(\"payments\","+ri+")'>Del</button>"
       +"</div></div>";
   });
   g("payList").innerHTML=payHtml||"<div class='empty'><div class='ei'>&#128184;</div>No standalone payments</div>";
@@ -1046,7 +1027,7 @@ function render() {
   let expTot=0,expHtml="";
   expArr.forEach(x=>{
     const ri=db.expenses.indexOf(x); expTot+=x.a;
-    expHtml+="<div class='rec exp-r'><div class='rec-name'>"+esc(x.desc)+" <span style='font-size:10px;color:var(--muted);'>["+x.cat+"]</span></div><div class='rec-sub'>Rs."+x.a.toFixed(2)+" | "+x.date+"</div>"+(x.note?"<div class='note-chip'>"+esc(x.note)+"</div>":"")+"<div class='row-btn'><button class='btn btn-blue' onclick='editEN("+ri+")'>Edit</button><button class='btn btn-del' onclick='delItem(\"expenses\","+ri+")'>Delete</button></div></div>";
+    expHtml+="<div class='rec exp-r'><div class='rec-name'>"+esc(x.desc)+" <span style='font-size:10px;color:var(--muted);'>["+x.cat+"]</span></div><div class='rec-sub'>Rs."+x.a.toFixed(2)+" | "+x.date+"</div>"+(x.note?"<div class='note-chip'>"+esc(x.note)+"</div>":"")+"<div class='row-btn'><button class='btn btn-blue' ontouchstart='editEN("+ri+")' onclick='editEN("+ri+")'>Edit</button><button class='btn btn-del' ontouchstart='delItem(\"expenses\","+ri+")' onclick='delItem(\"expenses\","+ri+")'>Delete</button></div></div>";
   });
   g("expList").innerHTML=expHtml||"<div class='empty'><div class='ei'>&#129534;</div>No expenses yet</div>";
   g("expTot").innerText=expTot.toFixed(2);
@@ -1125,8 +1106,7 @@ function exportData() {
   const blob=new Blob([csv],{type:"text/csv"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="SSHN_"+TODAY+".csv";a.click();
 }
 
-// set startFirebase immediately so PIN script can call it
-window._startFirebase = startFirebase;
+window._fbStart = startFirebase; // allow PIN stub to call it
 // expose globals
 window.showTab=showTab;window.setSF=setSF;window.setLF=setLF;
 window.calcDue=calcDue;window.toggleDel=toggleDel;
