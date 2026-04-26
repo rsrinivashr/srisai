@@ -709,9 +709,7 @@ function delStock(i){
 
 function adjustStock(i){
   var p=db.stock[i];
-  var adj=prompt('Adjust stock for "'+p.name+'".
-Current: '+p.qty+'
-Enter +10 to add or -3 to remove:');
+  var adj=prompt('Adjust stock for "'+p.name+'".\nCurrent: '+p.qty+'\nEnter +10 to add or -3 to remove:');
   if(adj===null) return;
   var n=parseInt(adj);
   if(isNaN(n)){alert('Enter a number like +5 or -2.');return;}
@@ -783,26 +781,9 @@ function sendWA(){
   var s=db.sales[curBillIdx],due=saleDue(s);
   if(!s.phone){alert('No phone number for this customer.');return;}
   var items='';
-  if(s.products&&s.products.length) for(var i=0;i<s.products.length;i++) items+='
-  - '+s.products[i].name+' x'+s.products[i].qty+' @ Rs.'+s.products[i].price;
-  if(s.item) items+='
-  - '+s.item;
-  var msg='*Sri Sai Home Needs - Bill*
-Furniture Shop, Chandanagar
-
-*Bill No:* '+(s.bill||'---')+'
-*Date:* '+s.date+'
-*Customer:* '+s.n+'
-
-*Items:*'+items+'
-
-*Total:* Rs.'+s.amt.toFixed(2)+'
-*Advance Paid:* Rs.'+(s.adv||0).toFixed(2)+'
-'+(due>0?'*Balance Due:* Rs.'+due.toFixed(2)+(s.dueDate?' (by '+s.dueDate+')':'')+'
-':'*Status:* PAID IN FULL
-')+'
-Thank you!
-Sri Sai Home Needs, Chandanagar';
+  if(s.products&&s.products.length) for(var i=0;i<s.products.length;i++) items+='\n  - '+s.products[i].name+' x'+s.products[i].qty+' @ Rs.'+s.products[i].price;
+  if(s.item) items+='\n  - '+s.item;
+  var msg='*Sri Sai Home Needs - Bill*\nFurniture Shop, Chandanagar\n\n*Bill No:* '+(s.bill||'---')+'\n*Date:* '+s.date+'\n*Customer:* '+s.n+'\n\n*Items:*'+items+'\n\n*Total:* Rs.'+s.amt.toFixed(2)+'\n*Advance Paid:* Rs.'+(s.adv||0).toFixed(2)+'\n'+(due>0?'*Balance Due:* Rs.'+due.toFixed(2)+(s.dueDate?' (by '+s.dueDate+')':'')+'\n':'*Status:* PAID IN FULL\n')+'\nThank you!\nSri Sai Home Needs, Chandanagar';
   var phone=s.phone.replace(/\D/g,'');
   if(phone.length===10) phone='91'+phone;
   window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(msg),'_blank');
@@ -834,9 +815,7 @@ function addSale(){
   g('sDate').value='';g('sMode').value='Cash';g('sDelivery').value='no';g('deliveryFields').style.display='none';
   var si=db.sales.length-1;
   saveDB();render();checkReminders();refreshProdDropdowns();
-  if(confirm('Sale saved! Bill: '+sale.bill+'
-
-Show bill preview?')) showBill(si);
+  if(confirm('Sale saved! Bill: '+sale.bill+'\n\nShow bill preview?')) showBill(si);
 }
 
 function addLead(){
@@ -880,8 +859,7 @@ function delItem(type,i){if(confirm('Delete this record?')){db[type].splice(i,1)
 
 function collectPayment(i){
   var s=db.sales[i],due=saleDue(s);
-  var col=parseFloat(prompt('Collecting from '+s.n+'?
-(Due: Rs.'+due.toFixed(2)+')',due.toFixed(2)));
+  var col=parseFloat(prompt('Collecting from '+s.n+'?\n(Due: Rs.'+due.toFixed(2)+')',due.toFixed(2)));
   if(isNaN(col)||col<=0) return;
   s.adv=Math.min((s.adv||0)+col,s.amt);
   saveDB();render();checkReminders();
@@ -1058,36 +1036,6 @@ function exportData(){
   rows.push([]);rows.push(['STOCK','','','','','','','','','','','','']);
   rows.push(['Product','Brand','Size','Category','Stock','Low Alert','MRP','Cost','Note']);
   for(var i=0;i<db.stock.length;i++){var x=db.stock[i];rows.push([x.name,x.brand||'',x.size||'',x.cat,x.qty,x.low||2,x.price||'',x.cost||'',x.note||'']);}
-  var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
-  var blob=new Blob([csv],{type:'text/csv'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='SriSai_'+TODAY+'.csv';a.click();
-}
-
-function clearAll(){
-  if(confirm('Delete ALL data permanently?')){
-    if(confirm('Second confirmation - delete everything?')){
-      db={sales:[],leads:[],orders:[],payments:[],expenses:[],stock:[]};billCounter=1;
-      saveDB();render();alert('All data cleared.');
-    }
-  }
-}
-
-// expose to global for onclick handlers
-window.showTab=showTab;window.setSaleFilter=setSaleFilter;window.setLeadFilter=setLeadFilter;
-window.calcDue=calcDue;window.toggleDelivery=toggleDelivery;
-window.addSaleProd=addSaleProd;window.removeSaleProd=removeSaleProd;
-window.addOrderProd=addOrderProd;window.removeOrderProd=removeOrderProd;
-window.addSale=addSale;window.addLead=addLead;window.addOrder=addOrder;
-window.addPayment=addPayment;window.addExpense=addExpense;
-window.delItem=delItem;window.collectPayment=collectPayment;
-window.markOrderDone=markOrderDone;window.markPayDone=markPayDone;window.markLeadDone=markLeadDone;
-window.callCustomer=callCustomer;window.waCustomer=waCustomer;
-window.editSaleNote=editSaleNote;window.editLeadNote=editLeadNote;window.editOrderNote=editOrderNote;
-window.saveStock=saveStock;window.clearStockForm=clearStockForm;window.editStock=editStock;
-window.delStock=delStock;window.adjustStock=adjustStock;window.renderStock=renderStock;
-window.showBill=showBill;window.closeBill=closeBill;window.printBill=printBill;window.sendWA=sendWA;
-window.closeRem=closeRem;window.genReport=genReport;window.exportData=exportData;window.clearAll=clearAll;
-window.render=render;
-
-</script>
+  var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');\n  var blob=new Blob([csv],{type:'text/csv'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='SriSai_'+TODAY+'.csv';a.click();\n}\n\nfunction clearAll(){\n  if(confirm('Delete ALL data permanently?')){\n    if(confirm('Second confirmation - delete everything?')){\n      db={sales:[],leads:[],orders:[],payments:[],expenses:[],stock:[]};billCounter=1;\n      saveDB();render();alert('All data cleared.');\n    }\n  }\n}\n\n// expose to global for onclick handlers\nwindow.showTab=showTab;window.setSaleFilter=setSaleFilter;window.setLeadFilter=setLeadFilter;\nwindow.calcDue=calcDue;window.toggleDelivery=toggleDelivery;\nwindow.addSaleProd=addSaleProd;window.removeSaleProd=removeSaleProd;\nwindow.addOrderProd=addOrderProd;window.removeOrderProd=removeOrderProd;\nwindow.addSale=addSale;window.addLead=addLead;window.addOrder=addOrder;\nwindow.addPayment=addPayment;window.addExpense=addExpense;\nwindow.delItem=delItem;window.collectPayment=collectPayment;\nwindow.markOrderDone=markOrderDone;window.markPayDone=markPayDone;window.markLeadDone=markLeadDone;\nwindow.callCustomer=callCustomer;window.waCustomer=waCustomer;\nwindow.editSaleNote=editSaleNote;window.editLeadNote=editLeadNote;window.editOrderNote=editOrderNote;\nwindow.saveStock=saveStock;window.clearStockForm=clearStockForm;window.editStock=editStock;\nwindow.delStock=delStock;window.adjustStock=adjustStock;window.renderStock=renderStock;\nwindow.showBill=showBill;window.closeBill=closeBill;window.printBill=printBill;window.sendWA=sendWA;\nwindow.closeRem=closeRem;window.genReport=genReport;window.exportData=exportData;window.clearAll=clearAll;\nwindow.render=render;\n\n</script>
 </body>
 </html>
