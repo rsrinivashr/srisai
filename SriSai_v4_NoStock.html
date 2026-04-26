@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sri Sai">
+<meta name="theme-color" content="#1a2940">
+<title>Sri Sai Home Needs</title>
+<style>
+:root{--bg:#f0f2f5;--card:#fff;--hdr:#1a2940;--green:#27ae60;--blue:#2471a3;--red:#e74c3c;--purple:#7d3c98;--orange:#ca6f1e;--teal:#148f77;--amber:#d4ac0d;--text:#1c2833;--muted:#6d7a8a;--border:#dce1e8;--shadow:0 2px 10px rgba(0,0,0,.07);}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overscroll-behavior:none;}
+header{background:var(--hdr);color:#fff;padding:12px 14px 8px;text-align:center;position:sticky;top:0;z-index:60;box-shadow:0 2px 8px rgba(0,0,0,.3);}
+header h2{font-size:16px;font-weight:800;}
+header p{font-size:11px;opacity:.6;margin-top:1px;}
+#clockBar{font-size:10px;opacity:.5;margin-top:2px;}
+#savedBar{font-size:10px;margin-top:2px;color:#a9dfbf;}
+.wrap{padding:10px;padding-bottom:78px;}
+.section{display:none;}.section.active{display:block;}
+.card{background:var(--card);border-radius:12px;padding:13px;margin-bottom:10px;box-shadow:var(--shadow);}
+.card-title{font-size:13px;font-weight:800;margin-bottom:10px;color:var(--text);}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.tile{border-radius:11px;padding:12px 10px;color:#fff;}
+.tile .ti{font-size:20px;margin-bottom:3px;}
+.tile .tv{font-size:19px;font-weight:900;line-height:1;}
+.tile .tl{font-size:10px;opacity:.85;margin-top:2px;}
+.t1{background:linear-gradient(135deg,#1e8449,#27ae60);}
+.t2{background:linear-gradient(135deg,#b7950b,#d4ac0d);color:#333;}.t2 .tl{color:#555;}
+.t3{background:linear-gradient(135deg,#1a5276,#2471a3);}
+.t4{background:linear-gradient(135deg,#6c3483,#7d3c98);}
+.t5{background:linear-gradient(135deg,#c0392b,#e74c3c);}
+.t6{background:linear-gradient(135deg,#0e6655,#148f77);}
+.t7{background:linear-gradient(135deg,#784212,#ca6f1e);}
+.t8{background:linear-gradient(135deg,#1a2940,#2c3e50);}
+.profit-pill{border-radius:9px;padding:8px 12px;font-size:12px;font-weight:800;text-align:center;margin-bottom:10px;}
+.fg{margin-bottom:8px;}
+.fg label{font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px;}
+input,select,textarea{width:100%;padding:9px 11px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;color:var(--text);background:#f9fafb;touch-action:manipulation;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);background:#fff;}
+textarea{resize:vertical;min-height:50px;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.btn{padding:10px 13px;border:none;border-radius:9px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;}
+.btn-save{background:var(--teal);width:100%;padding:13px;font-size:15px;margin-top:4px;}
+.btn-blue{background:var(--blue);}
+.btn-del{background:var(--red);}
+.btn-done{background:var(--green);}
+.btn-call{background:var(--orange);}
+.btn-wa{background:#25d366;}
+.btn-exp{background:var(--hdr);width:100%;padding:12px;font-size:13px;}
+.btn-clr{background:var(--red);width:100%;padding:10px;font-size:12px;margin-top:6px;}
+.row-btn{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap;}
+.rec{background:var(--card);border-radius:11px;padding:12px;margin-bottom:9px;box-shadow:var(--shadow);border-left:4px solid var(--teal);}
+.rec.lead-r{border-left-color:var(--blue);}
+.rec.order-r{border-left-color:var(--purple);}
+.rec.pay-r{border-left-color:var(--red);}
+.rec.exp-r{border-left-color:var(--orange);}
+.rec.closed-r{border-left-color:#bdc3c7;opacity:.7;}
+.rec.inprog-r{border-left-color:var(--amber);}
+.rec-name{font-weight:800;font-size:14px;}
+.rec-sub{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5;}
+.note-chip{font-size:11px;color:var(--muted);background:#f0f3f7;border-radius:5px;padding:3px 7px;margin-top:4px;display:inline-block;}
+.badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;margin-left:4px;}
+.b-closed{background:#eafaf1;color:var(--green);}
+.b-pending{background:#fdecea;color:var(--red);}
+.b-overdue{background:#fdecea;color:var(--red);}
+.b-today{background:#fef9e7;color:var(--orange);}
+.b-partial{background:#ebf5fb;color:var(--blue);}
+.pay-bar-wrap{margin:6px 0 2px;background:#ecf0f1;border-radius:20px;height:6px;overflow:hidden;}
+.pay-bar-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,#27ae60,#1e8449);}
+.sw{margin-bottom:8px;position:relative;}
+.sw input{padding-left:30px;}
+.sw .si{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:14px;}
+.sum-row{background:#ebf5fb;border-radius:8px;padding:7px 10px;margin-bottom:8px;font-size:12px;}
+.sum-row span{font-weight:800;color:var(--blue);}
+.tabs{position:fixed;bottom:0;left:0;right:0;display:flex;z-index:100;box-shadow:0 -2px 8px rgba(0,0,0,.15);}
+.tabs button{flex:1;padding:9px 1px 7px;border:none;color:#fff;font-size:8.5px;font-weight:800;cursor:pointer;background:#34495e;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:1px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;}
+.tabs button .ti{font-size:17px;line-height:1;}
+.tabs button:nth-child(1){background:#1a2940;}
+.tabs button:nth-child(2){background:#1e8449;}
+.tabs button:nth-child(3){background:#1a5276;}
+.tabs button:nth-child(4){background:#6c3483;}
+.tabs button:nth-child(5){background:#c0392b;}
+.tabs button:nth-child(6){background:#784212;}
+.tabs button:nth-child(7){background:#2c3e50;}
+.tabs button.active{filter:brightness(1.4);outline:3px solid rgba(255,255,255,.6);}
+#remOv{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);z-index:500;align-items:center;justify-content:center;}
+#remOv.show{display:flex;}
+#remBox{background:#fff;border-radius:14px;padding:16px;width:90%;max-width:380px;box-shadow:0 8px 24px rgba(0,0,0,.25);max-height:80vh;overflow-y:auto;}
+#remBox h3{color:var(--orange);font-size:16px;margin-bottom:5px;}
+#remBox ul{padding-left:15px;margin:7px 0;}
+#remBox li{margin-bottom:6px;font-size:12px;line-height:1.5;}
+.rem-ok{background:var(--green);color:#fff;border:none;border-radius:8px;padding:11px;width:100%;font-size:14px;font-weight:700;cursor:pointer;margin-top:9px;font-family:inherit;touch-action:manipulation;}
+.sec-hdr{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin:12px 0 6px;}
+.empty{text-align:center;padding:24px 0;color:var(--muted);font-size:13px;}
+.empty .ei{font-size:30px;margin-bottom:6px;}
+.due-box{background:#fef9e7;border:1.5px solid #f7dc6f;border-radius:9px;padding:9px;margin:7px 0;}
+.due-title{font-size:11px;font-weight:700;color:#b7950b;margin-bottom:6px;text-transform:uppercase;}
+.fu-item{padding:6px 0;border-bottom:1px solid #ecf0f1;font-size:12px;line-height:1.5;}
+.fu-item:last-child{border-bottom:none;}
+.fu-item a{color:var(--orange);text-decoration:none;font-weight:700;}
+.order-tag{font-size:11px;background:#f4ecf7;color:var(--purple);border-radius:5px;padding:2px 6px;margin-top:3px;display:inline-block;font-weight:700;}
+.filter-pills{display:flex;gap:5px;margin-bottom:8px;flex-wrap:wrap;}
+.pill{padding:5px 11px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-family:inherit;color:var(--muted);touch-action:manipulation;}
+.pill.on{background:var(--hdr);color:#fff;border-color:var(--hdr);}
+#billOv{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:600;align-items:center;justify-content:center;}
+#billOv.show{display:flex;}
+#billBox{background:#fff;border-radius:13px;width:93%;max-width:400px;box-shadow:0 8px 28px rgba(0,0,0,.35);max-height:88vh;overflow-y:auto;}
+#billContent{padding:16px;font-size:12px;}
+#billContent h3{text-align:center;font-size:15px;margin-bottom:2px;}
+.biz-sub{text-align:center;font-size:11px;color:var(--muted);margin-bottom:10px;}
+.bill-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f0f0f0;font-size:12px;}
+.bill-total{display:flex;justify-content:space-between;padding:6px 0;font-weight:900;font-size:13px;border-top:2px solid var(--hdr);margin-top:3px;}
+.bill-actions{display:flex;gap:7px;padding:10px 14px;border-top:1px solid var(--border);}
+.bill-actions .btn{flex:1;padding:10px;font-size:12px;}
+.sync-indicator{display:inline-block;width:7px;height:7px;border-radius:50%;background:#a9dfbf;margin-right:4px;}
+.sync-indicator.syncing{background:#f39c12;animation:pulse 1s infinite;}
+.sync-indicator.error{background:var(--red);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+</style>
+</head>
+<body>
+
+<header>
+  <h2>Sri Sai Home Needs</h2>
+  <p>Furniture Shop, Chandanagar</p>
+  <div id="clockBar"></div>
+  <div id="savedBar"><span class="sync-indicator" id="syncDot"></span><span id="syncMsg">Connecting...</span></div>
+</header>
+
+<div class="wrap">
+
+<!-- HOME -->
+<div id="home" class="section active">
+  <div class="dash-grid">
+    <div class="tile t2"><div class="ti">&#128197;</div><div class="tv">&#8377;<span id="dTodaySales">0</span></div><div class="tl">Today Sales</div></div>
+    <div class="tile t1"><div class="ti">&#128176;</div><div class="tv">&#8377;<span id="dTotalSales">0</span></div><div class="tl">Total Sales</div></div>
+    <div class="tile t5"><div class="ti">&#8987;</div><div class="tv">&#8377;<span id="dTotalDue">0</span></div><div class="tl">Total Due</div></div>
+    <div class="tile t3"><div class="ti">&#128203;</div><div class="tv" id="dLeads">0</div><div class="tl">Active Leads</div></div>
+    <div class="tile t4"><div class="ti">&#128230;</div><div class="tv" id="dOrders">0</div><div class="tl">Pending Orders</div></div>
+    <div class="tile t6"><div class="ti">&#129534;</div><div class="tv">&#8377;<span id="dExpenses">0</span></div><div class="tl">Expenses</div></div>
+    <div class="tile t7"><div class="ti">&#128722;</div><div class="tv" id="dInprog">0</div><div class="tl">In-Progress</div></div>
+    <div class="tile t8"><div class="ti">&#9989;</div><div class="tv" id="dClosed">0</div><div class="tl">Closed Sales</div></div>
+  </div>
+  <div class="profit-pill" id="profitPill">Net Profit: &#8377;0</div>
+  <div class="card"><div class="card-title">Today Follow-ups</div><div id="todayFU"></div></div>
+  <div class="card"><div class="card-title">Overdue Payments</div><div id="overduePay"></div></div>
+  <div class="card"><div class="card-title">Quick Summary</div><div id="quickSummary" style="font-size:12px;line-height:2;"></div></div>
+  <button class="btn btn-exp" ontouchstart="exportData()" onclick="exportData()">Export Full Report to Excel</button>
+</div>
+
+<!-- SALES -->
+<div id="sales" class="section">
+  <div class="card">
+    <div class="card-title">New Sale</div>
+    <div class="row2">
+      <div class="fg"><label>Bill No. (auto if blank)</label><input id="sBill" placeholder="Leave blank = auto"></div>
+      <div class="fg"><label>Sale Date</label><input id="sDate" type="date"></div>
+    </div>
+    <div class="fg"><label>Customer Name *</label><input id="sName" placeholder="Customer name"></div>
+    <div class="row2">
+      <div class="fg"><label>Phone</label><input id="sPhone" type="tel" placeholder="Mobile number"></div>
+      <div class="fg"><label>Payment Mode</label>
+        <select id="sMode">
+          <option value="Cash">Cash</option><option value="UPI">UPI</option><option value="Card">Card</option>
+          <option value="Credit/EMI">Credit/EMI</option><option value="Cheque">Cheque</option><option value="Mixed">Mixed</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg"><label>Item / Product</label><input id="sItem" placeholder="e.g. Sofa 3-seater, King bed"></div>
+    <div class="fg"><label>Total Sale Amount (&#8377;) *</label><input id="sAmt" type="number" placeholder="0" oninput="calcDue()"></div>
+    <div class="due-box">
+      <div class="due-title">Advance and Due Details</div>
+      <div class="row2">
+        <div class="fg"><label>Advance Paid (&#8377;)</label><input id="sAdv" type="number" placeholder="0" oninput="calcDue()"></div>
+        <div class="fg"><label>Balance Due (&#8377;)</label><input id="sDue" type="number" placeholder="0" readonly style="background:#fff3cd;font-weight:800;color:#7d6608;"></div>
+      </div>
+      <div class="fg"><label>Payment Due Date</label><input id="sDueDate" type="date"></div>
+    </div>
+    <div class="fg"><label>Delivery Needed?</label>
+      <select id="sDelivery" onchange="toggleDelivery()">
+        <option value="no">No - Customer Pickup</option>
+        <option value="yes">Yes - Home Delivery</option>
+      </select>
+    </div>
+    <div id="deliveryFields" style="display:none;">
+      <div class="fg"><label>Delivery Date</label><input id="sDelDate" type="date"></div>
+      <div class="fg"><label>Delivery Address</label><input id="sDelAddr" placeholder="Full delivery address"></div>
+    </div>
+    <div class="fg"><label>Note</label><textarea id="sNote" placeholder="Any remarks..."></textarea></div>
+    <button class="btn btn-save" ontouchstart="addSale()" onclick="addSale()">Save Sale</button>
+  </div>
+  <div class="filter-pills">
+    <button class="pill on" id="fp-all"     ontouchstart="setSaleFilter('all',this)"     onclick="setSaleFilter('all',this)">All</button>
+    <button class="pill"    id="fp-inprog"  ontouchstart="setSaleFilter('inprog',this)"  onclick="setSaleFilter('inprog',this)">In-Progress</button>
+    <button class="pill"    id="fp-closed"  ontouchstart="setSaleFilter('closed',this)"  onclick="setSaleFilter('closed',this)">Closed</button>
+    <button class="pill"    id="fp-overdue" ontouchstart="setSaleFilter('overdue',this)" onclick="setSaleFilter('overdue',this)">Overdue</button>
+  </div>
+  <div class="sw"><span class="si">&#128269;</span><input id="searchSales" placeholder="Search sales..." oninput="render()"></div>
+  <div class="sum-row">Showing: <span id="sScount">0</span> &nbsp;|&nbsp; Total: &#8377;<span id="sSamt">0</span> &nbsp;|&nbsp; Due: &#8377;<span id="sSDue">0</span></div>
+  <div id="salesList"></div>
+</div>
+
+<!-- LEADS -->
+<div id="leads" class="section">
+  <div class="card">
+    <div class="card-title">New Lead</div>
+    <div class="fg"><label>Customer Name *</label><input id="lName" placeholder="Customer name"></div>
+    <div class="row2">
+      <div class="fg"><label>Phone *</label><input id="lPhone" type="tel" placeholder="Mobile number"></div>
+      <div class="fg"><label>Follow-up Date *</label><input id="lDate" type="date"></div>
+    </div>
+    <div class="fg"><label>Interested In</label><input id="lItem" placeholder="e.g. Sofa, Wardrobe"></div>
+    <div class="row2">
+      <div class="fg"><label>Est. Budget (&#8377;)</label><input id="lBudget" type="number" placeholder="0"></div>
+      <div class="fg"><label>Source</label>
+        <select id="lSource">
+          <option>Walk-in</option><option>Referral</option><option>Social Media</option>
+          <option>Phone Enquiry</option><option>IM Lead</option><option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg"><label>Priority</label>
+      <select id="lPriority"><option value="Hot">Hot</option><option value="Warm" selected>Warm</option><option value="Cold">Cold</option></select>
+    </div>
+    <div class="fg"><label>Note</label><textarea id="lNote" placeholder="Any remarks..."></textarea></div>
+    <button class="btn btn-save" ontouchstart="addLead()" onclick="addLead()">Save Lead</button>
+  </div>
+  <div class="filter-pills">
+    <button class="pill on" id="lf-all"  ontouchstart="setLeadFilter('all',this)"  onclick="setLeadFilter('all',this)">All</button>
+    <button class="pill"    id="lf-hot"  ontouchstart="setLeadFilter('Hot',this)"  onclick="setLeadFilter('Hot',this)">Hot</button>
+    <button class="pill"    id="lf-warm" ontouchstart="setLeadFilter('Warm',this)" onclick="setLeadFilter('Warm',this)">Warm</button>
+    <button class="pill"    id="lf-cold" ontouchstart="setLeadFilter('Cold',this)" onclick="setLeadFilter('Cold',this)">Cold</button>
+    <button class="pill"    id="lf-due"  ontouchstart="setLeadFilter('due',this)"  onclick="setLeadFilter('due',this)">Due Today</button>
+  </div>
+  <div class="sw"><span class="si">&#128269;</span><input id="searchLeads" placeholder="Search leads..." oninput="render()"></div>
+  <div id="leadList"></div>
+</div>
+
+<!-- ORDERS -->
+<div id="orders" class="section">
+  <div class="card">
+    <div class="card-title">New Delivery Order</div>
+    <div class="fg"><label>Customer Name *</label><input id="oName" placeholder="Customer name"></div>
+    <div class="row2">
+      <div class="fg"><label>Phone</label><input id="oPhone" type="tel" placeholder="Mobile number"></div>
+      <div class="fg"><label>Delivery Date *</label><input id="oDate" type="date"></div>
+    </div>
+    <div class="fg"><label>Item / Product</label><input id="oItem" placeholder="Items to be delivered"></div>
+    <div class="fg"><label>Delivery Address</label><input id="oAddr" placeholder="Full delivery address"></div>
+    <div class="fg"><label>Linked Bill No.</label><input id="oLinkBill" placeholder="e.g. INV-001"></div>
+    <div class="fg"><label>Note</label><textarea id="oNote" placeholder="Any delivery instructions..."></textarea></div>
+    <button class="btn btn-save" ontouchstart="addOrder()" onclick="addOrder()">Save Order</button>
+  </div>
+  <div class="sw"><span class="si">&#128269;</span><input id="searchOrders" placeholder="Search orders..." oninput="render()"></div>
+  <div id="orderList"></div>
+</div>
+
+<!-- PAYMENTS -->
+<div id="payments" class="section">
+  <div class="card" style="background:#fef9e7;border:1.5px solid #f7dc6f;">
+    <div class="card-title">Pending Due Payments</div>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:7px;">Auto-tracked from Sales with balance due.</p>
+    <div id="autoDueList"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Add Standalone Payment Due</div>
+    <div class="fg"><label>Customer Name *</label><input id="pName" placeholder="Customer name"></div>
+    <div class="row2">
+      <div class="fg"><label>Phone</label><input id="pPhone" type="tel" placeholder="Mobile number"></div>
+      <div class="fg"><label>Amount Due (&#8377;) *</label><input id="pAmt" type="number" placeholder="0"></div>
+    </div>
+    <div class="row2">
+      <div class="fg"><label>Due Date *</label><input id="pDate" type="date"></div>
+      <div class="fg"><label>Bill / Ref No.</label><input id="pBill" placeholder="Reference"></div>
+    </div>
+    <div class="fg"><label>Note</label><textarea id="pNote" placeholder="Any remarks..."></textarea></div>
+    <button class="btn btn-save" ontouchstart="addPayment()" onclick="addPayment()">Save Payment Due</button>
+  </div>
+  <div class="sw"><span class="si">&#128269;</span><input id="searchPay" placeholder="Search payments..." oninput="render()"></div>
+  <div class="sum-row">Standalone Pending: &#8377;<span id="payPendTot">0</span></div>
+  <div id="payList"></div>
+</div>
+
+<!-- EXPENSES -->
+<div id="expenses" class="section">
+  <div class="card">
+    <div class="card-title">Add Expense</div>
+    <div class="row2">
+      <div class="fg"><label>Category</label>
+        <select id="eCat">
+          <option>Transport</option><option>Salary</option><option>Rent</option><option>Electricity</option>
+          <option>Stock Purchase</option><option>Maintenance</option><option>Marketing</option><option>Other</option>
+        </select>
+      </div>
+      <div class="fg"><label>Amount (&#8377;) *</label><input id="eAmt" type="number" placeholder="0"></div>
+    </div>
+    <div class="fg"><label>Description *</label><input id="eDesc" placeholder="e.g. Auto fare, Staff salary"></div>
+    <div class="fg"><label>Note</label><textarea id="eNote" placeholder="Optional details..."></textarea></div>
+    <button class="btn btn-save" ontouchstart="addExpense()" onclick="addExpense()">Save Expense</button>
+  </div>
+  <div class="sw"><span class="si">&#128269;</span><input id="searchExp" placeholder="Search expenses..." oninput="render()"></div>
+  <div class="sum-row">Total shown: &#8377;<span id="expTot">0</span></div>
+  <div id="expList"></div>
+</div>
+
+<!-- REPORTS -->
+<div id="reports" class="section">
+  <div class="card">
+    <div class="card-title">Date-wise Report</div>
+    <div class="row2">
+      <div class="fg"><label>From</label><input type="date" id="repFrom"></div>
+      <div class="fg"><label>To</label><input type="date" id="repTo"></div>
+    </div>
+    <button class="btn btn-save" style="background:var(--blue);" ontouchstart="genReport()" onclick="genReport()">Generate Report</button>
+  </div>
+  <div id="reportOut"></div>
+  <button class="btn btn-exp" ontouchstart="exportData()" onclick="exportData()" style="margin-top:6px;">Export All Data to Excel</button>
+  <button class="btn btn-clr" ontouchstart="clearAll()" onclick="clearAll()">Clear ALL Data</button>
+</div>
+
+</div>
+
+<!-- TABS - 7 tabs, simpler -->
+<div class="tabs">
+  <button ontouchstart="showTab('home',this)" onclick="showTab('home',this)" class="active"><span class="ti">&#127968;</span>Home</button>
+  <button ontouchstart="showTab('sales',this)" onclick="showTab('sales',this)"><span class="ti">&#128176;</span>Sales</button>
+  <button ontouchstart="showTab('leads',this)" onclick="showTab('leads',this)"><span class="ti">&#128203;</span>Leads</button>
+  <button ontouchstart="showTab('orders',this)" onclick="showTab('orders',this)"><span class="ti">&#128230;</span>Orders</button>
+  <button ontouchstart="showTab('payments',this)" onclick="showTab('payments',this)"><span class="ti">&#128184;</span>Pay</button>
+  <button ontouchstart="showTab('expenses',this)" onclick="showTab('expenses',this)"><span class="ti">&#129534;</span>Expense</button>
+  <button ontouchstart="showTab('reports',this)" onclick="showTab('reports',this)"><span class="ti">&#128202;</span>Reports</button>
+</div>
+
+<!-- REMINDER -->
+<div id="remOv">
+  <div id="remBox">
+    <h3>Today Reminders</h3>
+    <p style="font-size:11px;color:#666;">Items needing attention:</p>
+    <ul id="remList"></ul>
+    <button class="rem-ok" ontouchstart="closeRem()" onclick="closeRem()">OK Got It!</button>
+  </div>
+</div>
+
+<!-- BILL -->
+<div id="billOv">
+  <div id="billBox">
+    <div id="billContent"></div>
+    <div class="bill-actions">
+      <button class="btn btn-wa"   ontouchstart="sendWA()" onclick="sendWA()">WhatsApp Bill</button>
+      <button class="btn btn-blue" ontouchstart="printBill()" onclick="printBill()">Print/PDF</button>
+      <button class="btn" style="background:var(--muted);" ontouchstart="closeBill()" onclick="closeBill()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCNgXCLNfs08QfrAzip8LUCOossRE3usUQ",
+  authDomain: "ourstore-4bc0c.firebaseapp.com",
+  projectId: "ourstore-4bc0c",
+  storageBucket: "ourstore-4bc0c.firebasestorage.app",
+  messagingSenderId: "526211549396",
+  appId: "1:526211549396:web:6ce8a6daf6ad10b3b39341"
+};
+
+const app  = initializeApp(firebaseConfig);
+const db_f = getFirestore(app);
+const DOC  = doc(db_f, 'srisai', 'data_no_stock');
+
+var db = { sales:[], leads:[], orders:[], payments:[], expenses:[] };
+var TODAY = new Date().toISOString().split('T')[0];
+var billCounter = 1;
+var curBillIdx  = -1;
+var saveTimer   = null;
+
+function syncStatus(msg, state){
+  var dot=document.getElementById('syncDot'), txt=document.getElementById('syncMsg');
+  txt.innerText=msg; dot.className='sync-indicator'+(state?' '+state:'');
+}
+
+function saveDB(){
+  try{localStorage.setItem('srisai_v4_nostock',JSON.stringify({db:db,billCounter:billCounter}));}catch(e){}
+  if(saveTimer) clearTimeout(saveTimer);
+  saveTimer=setTimeout(function(){
+    syncStatus('Saving...','syncing');
+    var payload=JSON.parse(JSON.stringify(db)); payload.billCounter=billCounter;
+    setDoc(DOC,payload).then(function(){
+      syncStatus('Synced at '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}),'');
+    }).catch(function(e){syncStatus('Sync failed - saved locally','error');});
+  },800);
+}
+
+syncStatus('Connecting...','syncing');
+onSnapshot(DOC,function(snap){
+  if(snap.exists()){
+    var p=snap.data();
+    db.sales=p.sales||[];db.leads=p.leads||[];db.orders=p.orders||[];
+    db.payments=p.payments||[];db.expenses=p.expenses||[];
+    if(p.billCounter) billCounter=p.billCounter;
+    syncStatus('Synced at '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}),'');
+    render();checkReminders();
+  } else {
+    try{var r=localStorage.getItem('srisai_v4_nostock');if(r){var p2=JSON.parse(r);db=p2.db||db;billCounter=p2.billCounter||1;}}catch(e){}
+    syncStatus('Ready','');render();
+  }
+},function(err){
+  try{var r=localStorage.getItem('srisai_v4_nostock');if(r){var p2=JSON.parse(r);db=p2.db||db;billCounter=p2.billCounter||1;}}catch(e){}
+  syncStatus('Connection error','error');render();
+});
+
+function g(id){return document.getElementById(id);}
+function genBillNo(){var n='INV-'+String(billCounter).padStart(4,'0');billCounter++;return n;}
+function calcDue(){var t=parseFloat(g('sAmt').value)||0,a=parseFloat(g('sAdv').value)||0;g('sDue').value=Math.max(0,t-a)>0?Math.max(0,t-a).toFixed(2):'';}
+function toggleDelivery(){g('deliveryFields').style.display=g('sDelivery').value==='yes'?'block':'none';}
+function saleStatus(s){var t=s.amt||0,a=s.adv||0;if(t<=0||a>=t) return 'closed';if(a>0) return 'inprog';return 'pending';}
+function saleDue(s){return Math.max(0,(s.amt||0)-(s.adv||0));}
+function dateBadge(d){if(!d) return '';if(d<TODAY) return '<span class="badge b-overdue">Overdue</span>';if(d===TODAY) return '<span class="badge b-today">Today</span>';return '';}
+function priorityColor(p){if(p==='Hot') return '#e74c3c';if(p==='Warm') return '#d4ac0d';return '#2471a3';}
+
+function tickClock(){var now=new Date();g('clockBar').innerText=now.toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short'})+'  -  '+now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});}
+setInterval(tickClock,1000);tickClock();
+
+var tabLock=false;
+function showTab(id,btn){
+  if(tabLock) return;tabLock=true;setTimeout(function(){tabLock=false;},300);
+  document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
+  g(id).classList.add('active');
+  document.querySelectorAll('.tabs button').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  render();
+}
+
+var saleFilter='all',leadFilter='all';
+function setSaleFilter(f,btn){saleFilter=f;document.querySelectorAll('.pill[id^="fp-"]').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');render();}
+function setLeadFilter(f,btn){leadFilter=f;document.querySelectorAll('.pill[id^="lf-"]').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');render();}
+
+// BILL
+function showBill(si){
+  curBillIdx=si;var s=db.sales[si],due=saleDue(s);
+  var html='<h3>Sri Sai Home Needs</h3><div class="biz-sub">Furniture Shop, Chandanagar</div>'
+    +'<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:8px;"><span>Bill: <b>'+(s.bill||'---')+'</b></span><span>Date: <b>'+s.date+'</b></span></div>'
+    +'<div class="bill-row"><span>Customer</span><span><b>'+s.n+'</b></span></div>'
+    +(s.phone?'<div class="bill-row"><span>Phone</span><span>'+s.phone+'</span></div>':'')
+    +'<div style="margin:8px 0 3px;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;">Items</div>'
+    +'<div class="bill-row"><span>'+(s.item||'---')+'</span><span>---</span></div>'
+    +'<div class="bill-total"><span>Total Amount</span><span>Rs.'+s.amt.toFixed(2)+'</span></div>'
+    +'<div class="bill-row"><span>Advance Paid</span><span>Rs.'+(s.adv||0).toFixed(2)+'</span></div>';
+  if(due>0) html+='<div class="bill-row" style="color:var(--red);"><span>Balance Due</span><span><b>Rs.'+due.toFixed(2)+'</b></span></div>'+(s.dueDate?'<div class="bill-row"><span>Due Date</span><span>'+s.dueDate+'</span></div>':'');
+  html+='<div class="bill-row"><span>Payment Mode</span><span>'+(s.mode||'---')+'</span></div>';
+  if(due===0) html+='<div style="text-align:center;margin-top:10px;color:var(--green);font-weight:900;">PAID IN FULL</div>';
+  html+='<div style="text-align:center;margin-top:14px;font-size:11px;color:var(--muted);">Thank you for shopping!<br>Sri Sai Home Needs, Chandanagar</div>';
+  g('billContent').innerHTML=html;g('billOv').style.display='flex';
+}
+function closeBill(){g('billOv').style.display='none';curBillIdx=-1;}
+function printBill(){var win=window.open('','_blank');win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Bill</title><style>body{font-family:Arial,sans-serif;padding:18px;max-width:380px;margin:0 auto;font-size:12px;}h3{text-align:center;}.biz-sub{text-align:center;font-size:11px;color:#666;margin-bottom:10px;}.bill-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #eee;}.bill-total{display:flex;justify-content:space-between;padding:5px 0;font-weight:900;font-size:13px;border-top:2px solid #333;margin-top:3px;}</style></head><body>'+g('billContent').innerHTML+'</body></html>');win.document.close();win.print();}
+function sendWA(){
+  if(curBillIdx<0) return;var s=db.sales[curBillIdx],due=saleDue(s);
+  if(!s.phone){alert('No phone number for this customer.');return;}
+  var msg='*Sri Sai Home Needs - Bill*
+Furniture Shop, Chandanagar
+
+*Bill No:* '+(s.bill||'---')+'
+*Date:* '+s.date+'
+*Customer:* '+s.n+'
+
+*Item:* '+(s.item||'---')+'
+
+*Total:* Rs.'+s.amt.toFixed(2)+'
+*Advance Paid:* Rs.'+(s.adv||0).toFixed(2)+'
+'+(due>0?'*Balance Due:* Rs.'+due.toFixed(2)+(s.dueDate?' (by '+s.dueDate+')':'')+'
+':'*Status:* PAID IN FULL
+')+'
+Thank you!
+Sri Sai Home Needs, Chandanagar';
+  var phone=s.phone.replace(/[^0-9]/g,'');if(phone.length===10) phone='91'+phone;
+  window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(msg),'_blank');
+}
+function waCustomer(phone){if(!phone){alert('No phone saved.');return;}var p=phone.replace(/[^0-9]/g,'');if(p.length===10) p='91'+p;window.open('https://wa.me/'+p,'_blank');}
+
+// ADD FUNCTIONS
+function addSale(){
+  var name=g('sName').value.trim(),amt=parseFloat(g('sAmt').value)||0;
+  if(!name){alert('Customer Name required.');return;}if(amt<=0){alert('Sale Amount required.');return;}
+  var adv=parseFloat(g('sAdv').value)||0,due=Math.max(0,amt-adv),dueDate=g('sDueDate').value,delivery=g('sDelivery').value==='yes';
+  if(due>0&&!dueDate){if(!confirm('Balance due Rs.'+due.toFixed(2)+' but no Due Date. Continue?')) return;}
+  var billVal=g('sBill').value.trim()||genBillNo();
+  var sale={bill:billVal,date:g('sDate').value||TODAY,n:name,phone:g('sPhone').value.trim(),mode:g('sMode').value,item:g('sItem').value.trim(),amt:amt,adv:adv,dueDate:dueDate,note:g('sNote').value.trim(),delivery:delivery,delDate:delivery?g('sDelDate').value:'',delAddr:delivery?g('sDelAddr').value.trim():''};
+  db.sales.push(sale);
+  if(delivery&&sale.delDate) db.orders.push({n:name,phone:sale.phone,item:sale.item,d:sale.delDate,addr:sale.delAddr,linkBill:sale.bill,note:'Auto from Sale #'+sale.bill,done:false});
+  ['sBill','sName','sPhone','sItem','sAmt','sAdv','sDue','sDueDate','sNote','sDelDate','sDelAddr'].forEach(function(id){g(id).value='';});
+  g('sDate').value='';g('sMode').value='Cash';g('sDelivery').value='no';g('deliveryFields').style.display='none';
+  var si=db.sales.length-1;saveDB();render();checkReminders();
+  if(confirm('Sale saved! Bill: '+sale.bill+'
+
+Show bill preview?')) showBill(si);
+}
+function addLead(){
+  var name=g('lName').value.trim(),date=g('lDate').value;
+  if(!name||!date){alert('Name and Follow-up Date required.');return;}
+  db.leads.push({n:name,phone:g('lPhone').value.trim(),item:g('lItem').value.trim(),d:date,budget:parseFloat(g('lBudget').value)||0,source:g('lSource').value,priority:g('lPriority').value,note:g('lNote').value.trim(),done:false});
+  ['lName','lPhone','lItem','lDate','lBudget','lNote'].forEach(function(id){g(id).value='';});
+  saveDB();render();checkReminders();alert('Lead saved!');
+}
+function addOrder(){
+  var name=g('oName').value.trim(),date=g('oDate').value;
+  if(!name||!date){alert('Name and Delivery Date required.');return;}
+  db.orders.push({n:name,phone:g('oPhone').value.trim(),item:g('oItem').value.trim(),d:date,addr:g('oAddr').value.trim(),linkBill:g('oLinkBill').value.trim(),note:g('oNote').value.trim(),done:false});
+  ['oName','oPhone','oItem','oDate','oAddr','oLinkBill','oNote'].forEach(function(id){g(id).value='';});
+  saveDB();render();checkReminders();alert('Order saved!');
+}
+function addPayment(){
+  var name=g('pName').value.trim(),amt=parseFloat(g('pAmt').value)||0,date=g('pDate').value;
+  if(!name||!amt||!date){alert('Name, Amount and Due Date required.');return;}
+  db.payments.push({n:name,phone:g('pPhone').value.trim(),a:amt,d:date,bill:g('pBill').value.trim(),note:g('pNote').value.trim(),done:false});
+  ['pName','pPhone','pAmt','pDate','pBill','pNote'].forEach(function(id){g(id).value='';});
+  saveDB();render();checkReminders();alert('Payment due saved!');
+}
+function addExpense(){
+  var desc=g('eDesc').value.trim(),amt=parseFloat(g('eAmt').value)||0;
+  if(!desc||!amt){alert('Description and Amount required.');return;}
+  db.expenses.push({desc:desc,cat:g('eCat').value,a:amt,note:g('eNote').value.trim(),date:TODAY});
+  ['eDesc','eAmt','eNote'].forEach(function(id){g(id).value='';});
+  saveDB();render();alert('Expense saved!');
+}
+
+function delItem(type,i){if(confirm('Delete this record?')){db[type].splice(i,1);saveDB();render();}}
+function collectPayment(i){
+  var s=db.sales[i],due=saleDue(s);
+  var col=parseFloat(prompt('Collecting from '+s.n+'?
+(Due: Rs.'+due.toFixed(2)+')',due.toFixed(2)));
+  if(isNaN(col)||col<=0) return;
+  s.adv=Math.min((s.adv||0)+col,s.amt);saveDB();render();checkReminders();
+  var rem=saleDue(s);alert(rem>0?'Rs.'+col.toFixed(2)+' collected. Still due: Rs.'+rem.toFixed(2):'Full payment! Sale CLOSED.');
+}
+function markOrderDone(i){db.orders[i].done=true;saveDB();render();checkReminders();}
+function markPayDone(i){db.payments[i].done=true;saveDB();render();checkReminders();}
+function markLeadDone(i){db.leads[i].done=true;saveDB();render();checkReminders();}
+function callCustomer(phone){if(phone) window.location.href='tel:'+phone;else alert('No phone saved.');}
+function editSaleNote(i){var s=db.sales[i],n=prompt('Edit Note:',s.note||'');if(n!==null){s.note=n;saveDB();render();}}
+function editLeadNote(i){var l=db.leads[i];var d=prompt('Edit Follow-up Date (YYYY-MM-DD):',l.d);if(d!==null&&d.trim()) l.d=d.trim();var n=prompt('Edit Note:',l.note||'');if(n!==null) l.note=n;saveDB();render();checkReminders();}
+function editOrderNote(i){var o=db.orders[i];var d=prompt('Edit Delivery Date (YYYY-MM-DD):',o.d);if(d!==null&&d.trim()) o.d=d.trim();var n=prompt('Edit Note:',o.note||'');if(n!==null) o.note=n;saveDB();render();checkReminders();}
+
+function filt(arr,sid){var q=g(sid)?g(sid).value.trim().toLowerCase():'';if(!q) return arr;return arr.filter(function(x){return (x.n&&x.n.toLowerCase().includes(q))||(x.phone&&x.phone.includes(q))||(x.bill&&x.bill.toLowerCase().includes(q))||(x.item&&x.item.toLowerCase().includes(q))||(x.desc&&x.desc.toLowerCase().includes(q));});}
+
+function render(){
+  // SALES
+  var salArr=filt(db.sales,'searchSales');
+  salArr=salArr.filter(function(x){var st=saleStatus(x);if(saleFilter==='all') return true;if(saleFilter==='closed') return st==='closed';if(saleFilter==='inprog') return st==='inprog'||st==='pending';if(saleFilter==='overdue') return st!=='closed'&&x.dueDate&&x.dueDate<TODAY;return true;});
+  var sTotalAmt=0,sTotalDue=0,salHtml='';
+  for(var i=0;i<salArr.length;i++){
+    var x=salArr[i],ri=db.sales.indexOf(x),st=saleStatus(x),due=saleDue(x),pct=x.amt>0?Math.round(((x.adv||0)/x.amt)*100):100;
+    sTotalAmt+=x.amt;sTotalDue+=due;
+    var stLabel=st==='closed'?'<span class="badge b-closed">Closed</span>':st==='inprog'?'<span class="badge b-partial">In-Progress</span>':'<span class="badge b-pending">Pending</span>';
+    salHtml+='<div class="rec'+(st==='closed'?' closed-r':st==='inprog'?' inprog-r':'')+'">'
+      +'<div class="rec-name">'+x.n+(x.bill?' <span style="font-size:10px;color:var(--muted);">#'+x.bill+'</span>':'')+stLabel+(st!=='closed'&&x.dueDate?dateBadge(x.dueDate):'')+'</div>'
+      +'<div class="rec-sub">'+x.date+(x.item?' | '+x.item:'')+' | '+(x.mode||'')+(x.phone?' | '+x.phone:'')+'</div>'
+      +'<div class="rec-sub">Total: <b>Rs.'+x.amt.toFixed(2)+'</b> | Paid: <b>Rs.'+(x.adv||0).toFixed(2)+'</b>'+(due>0?' | Due: <b style="color:var(--red)">Rs.'+due.toFixed(2)+'</b>':'')+(x.dueDate&&st!=='closed'?' | by '+x.dueDate:'')+'</div>'
+      +'<div class="pay-bar-wrap"><div class="pay-bar-fill" style="width:'+pct+'%"></div></div>'
+      +'<div style="font-size:10px;color:var(--muted);margin-bottom:2px;">'+pct+'% paid</div>'
+      +(x.delivery?'<div class="rec-sub">Delivery: '+(x.delDate||'TBD')+(x.delAddr?' - '+x.delAddr:'')+'</div>':'')
+      +(x.note?'<div class="note-chip">'+x.note+'</div>':'')
+      +'<div class="row-btn">'
+      +(x.phone?'<button class="btn btn-call" ontouchstart="callCustomer(''+x.phone+'')" onclick="callCustomer(''+x.phone+'')">Call</button>':'')
+      +(x.phone?'<button class="btn btn-wa"   ontouchstart="waCustomer(''+x.phone+'')"   onclick="waCustomer(''+x.phone+'')">WA</button>':'')
+      +'<button class="btn btn-blue"  ontouchstart="showBill('+ri+')" onclick="showBill('+ri+')">Bill</button>'
+      +(st!=='closed'?'<button class="btn btn-done" ontouchstart="collectPayment('+ri+')" onclick="collectPayment('+ri+')">Collect</button>':'')
+      +'<button class="btn" style="background:var(--muted);" ontouchstart="editSaleNote('+ri+')" onclick="editSaleNote('+ri+')">Note</button>'
+      +'<button class="btn btn-del" ontouchstart="delItem('sales','+ri+')" onclick="delItem('sales','+ri+')">Del</button>'
+      +'</div></div>';
+  }
+  g('salesList').innerHTML=salHtml||'<div class="empty"><div class="ei">&#128176;</div>No sales found</div>';
+  g('sScount').innerText=salArr.length;g('sSamt').innerText=sTotalAmt.toFixed(2);g('sSDue').innerText=sTotalDue.toFixed(2);
+
+  // AUTO DUE
+  var adArr=db.sales.filter(function(x){return saleStatus(x)!=='closed';});
+  var adHtml=adArr.length===0?'<div style="font-size:12px;color:var(--green);padding:7px 0;">No pending dues!</div>':'';
+  for(var i=0;i<adArr.length;i++){var x=adArr[i],ri=db.sales.indexOf(x),due=saleDue(x);adHtml+='<div style="padding:7px 0;border-bottom:1px solid #ecf0f1;font-size:12px;"><b>'+x.n+'</b>'+(x.bill?' #'+x.bill:'')+' - Rs.'+due.toFixed(2)+(x.dueDate?' | Due: '+x.dueDate+dateBadge(x.dueDate):'')+(x.phone?'<br><a href="tel:'+x.phone+'" style="color:var(--orange);font-weight:700;">'+x.phone+'</a>':'')+' <button class="btn btn-done" style="padding:4px 9px;font-size:11px;" ontouchstart="collectPayment('+ri+')" onclick="collectPayment('+ri+')">Collect</button>'+(x.phone?' <button class="btn btn-wa" style="padding:4px 7px;font-size:11px;" ontouchstart="waCustomer(''+x.phone+'')" onclick="waCustomer(''+x.phone+'')">WA</button>':''  )+'</div>';}
+  g('autoDueList').innerHTML=adHtml;
+
+  // LEADS
+  var ledArr=filt(db.leads,'searchLeads');
+  ledArr=ledArr.filter(function(x){if(leadFilter==='all') return !x.done;if(leadFilter==='due') return !x.done&&x.d<=TODAY;return !x.done&&x.priority===leadFilter;});
+  var ledHtml='';
+  for(var i=0;i<ledArr.length;i++){var x=ledArr[i],ri=db.leads.indexOf(x);ledHtml+='<div class="rec lead-r"><div class="rec-name" style="border-left:3px solid '+priorityColor(x.priority||'Warm')+';padding-left:5px;">'+x.n+dateBadge(x.d)+(x.priority?'<span class="badge" style="background:#f4f6f7;color:'+priorityColor(x.priority)+';">'+x.priority+'</span>':'')+'</div><div class="rec-sub">Follow-up: '+x.d+(x.phone?' | '+x.phone:'')+(x.item?'<br>'+x.item:'')+(x.budget?' | Budget: Rs.'+x.budget:'')+'</div>'+(x.source?'<div class="rec-sub">Source: '+x.source+'</div>':'')+(x.note?'<div class="note-chip">'+x.note+'</div>':'')+'<div class="row-btn">'+(x.phone?'<button class="btn btn-call" ontouchstart="callCustomer(''+x.phone+'')" onclick="callCustomer(''+x.phone+'')">Call</button>':'')+(x.phone?'<button class="btn btn-wa" ontouchstart="waCustomer(''+x.phone+'')" onclick="waCustomer(''+x.phone+'')">WA</button>':'')+'<button class="btn btn-blue" ontouchstart="editLeadNote('+ri+')" onclick="editLeadNote('+ri+')">Edit</button><button class="btn btn-done" ontouchstart="markLeadDone('+ri+')" onclick="markLeadDone('+ri+')">Done</button><button class="btn btn-del" ontouchstart="delItem('leads','+ri+')" onclick="delItem('leads','+ri+')">Del</button></div></div>';}
+  g('leadList').innerHTML=ledHtml||'<div class="empty"><div class="ei">&#128203;</div>No leads found</div>';
+
+  // ORDERS
+  var ordArr=filt(db.orders,'searchOrders'),ordHtml='';
+  for(var i=0;i<ordArr.length;i++){var x=ordArr[i],ri=db.orders.indexOf(x);ordHtml+='<div class="rec order-r'+(x.done?' closed-r':'')+'">'+'<div class="rec-name">'+x.n+(x.done?'<span class="badge b-closed">Delivered</span>':dateBadge(x.d))+'</div><div class="rec-sub">Delivery: '+x.d+(x.phone?' | '+x.phone:'')+(x.item?'<br>'+x.item:'')+(x.addr?'<br>'+x.addr:'')+'</div>'+(x.linkBill?'<div class="order-tag">Linked: '+x.linkBill+'</div>':'')+(x.note?'<div class="note-chip">'+x.note+'</div>':'')+'<div class="row-btn">'+(x.phone?'<button class="btn btn-call" ontouchstart="callCustomer(''+x.phone+'')" onclick="callCustomer(''+x.phone+'')">Call</button>':'')+(x.phone?'<button class="btn btn-wa" ontouchstart="waCustomer(''+x.phone+'')" onclick="waCustomer(''+x.phone+'')">WA</button>':'')+'<button class="btn btn-done" ontouchstart="markOrderDone('+ri+')" onclick="markOrderDone('+ri+')">Delivered</button><button class="btn btn-blue" ontouchstart="editOrderNote('+ri+')" onclick="editOrderNote('+ri+')">Edit</button><button class="btn btn-del" ontouchstart="delItem('orders','+ri+')" onclick="delItem('orders','+ri+')">Del</button></div></div>';}
+  g('orderList').innerHTML=ordHtml||'<div class="empty"><div class="ei">&#128230;</div>No orders yet</div>';
+
+  // PAYMENTS
+  var payArr=filt(db.payments,'searchPay'),payPend=0,payHtml='';
+  for(var i=0;i<payArr.length;i++){var x=payArr[i],ri=db.payments.indexOf(x);if(!x.done) payPend+=x.a;payHtml+='<div class="rec pay-r'+(x.done?' closed-r':'')+'">'+'<div class="rec-name">'+x.n+(x.done?'<span class="badge b-closed">Paid</span>':'<span class="badge b-pending">Unpaid</span>')+(!x.done?dateBadge(x.d):'')+'</div><div class="rec-sub">Rs.'+x.a.toFixed(2)+' | Due: '+x.d+(x.bill?' | #'+x.bill:'')+(x.phone?' | '+x.phone:'')+'</div>'+(x.note?'<div class="note-chip">'+x.note+'</div>':'')+'<div class="row-btn">'+(x.phone?'<button class="btn btn-call" ontouchstart="callCustomer(''+x.phone+'')" onclick="callCustomer(''+x.phone+'')">Call</button>':'')+(x.phone?'<button class="btn btn-wa" ontouchstart="waCustomer(''+x.phone+'')" onclick="waCustomer(''+x.phone+'')">WA</button>':'')+'<button class="btn btn-done" ontouchstart="markPayDone('+ri+')" onclick="markPayDone('+ri+')">Mark Paid</button><button class="btn btn-del" ontouchstart="delItem('payments','+ri+')" onclick="delItem('payments','+ri+')">Del</button></div></div>';}
+  g('payList').innerHTML=payHtml||'<div class="empty"><div class="ei">&#128184;</div>No standalone payments</div>';
+  g('payPendTot').innerText=payPend.toFixed(2);
+
+  // EXPENSES
+  var expArr=filt(db.expenses,'searchExp'),expTot=0,expHtml='';
+  for(var i=0;i<expArr.length;i++){var x=expArr[i],ri=db.expenses.indexOf(x);expTot+=x.a;expHtml+='<div class="rec exp-r"><div class="rec-name">'+x.desc+' <span style="font-size:10px;color:var(--muted);">['+x.cat+']</span></div><div class="rec-sub">Rs.'+x.a.toFixed(2)+' | '+x.date+'</div>'+(x.note?'<div class="note-chip">'+x.note+'</div>':'')+'<div class="row-btn"><button class="btn btn-del" ontouchstart="delItem('expenses','+ri+')" onclick="delItem('expenses','+ri+')">Delete</button></div></div>';}
+  g('expList').innerHTML=expHtml||'<div class="empty"><div class="ei">&#129534;</div>No expenses yet</div>';
+  g('expTot').innerText=expTot.toFixed(2);
+
+  // DASHBOARD
+  var allSales=0,todSales=0,totalDue=0,inprogCt=0,closedCt=0;
+  for(var i=0;i<db.sales.length;i++){var x=db.sales[i];allSales+=x.amt;if(x.date===TODAY) todSales+=x.amt;totalDue+=saleDue(x);if(saleStatus(x)==='closed') closedCt++;else inprogCt++;}
+  var allExp=0;for(var i=0;i<db.expenses.length;i++) allExp+=db.expenses[i].a;
+  var pendLead=db.leads.filter(function(x){return !x.done;}).length;
+  var pendOrder=db.orders.filter(function(x){return !x.done;}).length;
+  var profit=allSales-allExp;
+  g('dTodaySales').innerText=todSales.toFixed(2);g('dTotalSales').innerText=allSales.toFixed(2);
+  g('dTotalDue').innerText=totalDue.toFixed(2);g('dLeads').innerText=pendLead;g('dOrders').innerText=pendOrder;
+  g('dExpenses').innerText=allExp.toFixed(2);g('dInprog').innerText=inprogCt;g('dClosed').innerText=closedCt;
+  var pp=g('profitPill');
+  pp.innerHTML='Net Profit: <b>Rs.'+profit.toFixed(2)+'</b>'+(profit>=0?' (UP)':' (DOWN)');
+  pp.style.background=profit>=0?'linear-gradient(90deg,#eafaf1,#d5f5e3)':'linear-gradient(90deg,#fdecea,#fadbd8)';
+  pp.style.color=profit>=0?'var(--green)':'var(--red)';
+  g('quickSummary').innerHTML='Total Bills: <b>'+db.sales.length+'</b> | Closed: <b>'+closedCt+'</b> | In-Progress: <b>'+inprogCt+'</b><br>Active Leads: <b>'+pendLead+'</b> | Pending Deliveries: <b>'+pendOrder+'</b><br>Total Due: <b style="color:var(--red)">Rs.'+totalDue.toFixed(2)+'</b>';
+  var tfu=[];
+  for(var i=0;i<db.leads.length;i++){var x=db.leads[i];if(!x.done&&x.d===TODAY) tfu.push('Lead: <b>'+x.n+'</b>'+(x.phone?'<a class="fu-item" href="tel:'+x.phone+'"> '+x.phone+'</a>':'')+(x.item?' - '+x.item:''));}
+  for(var i=0;i<db.orders.length;i++){var x=db.orders[i];if(!x.done&&x.d===TODAY) tfu.push('Delivery: <b>'+x.n+'</b>'+(x.phone?'<a class="fu-item" href="tel:'+x.phone+'"> '+x.phone+'</a>':''));}
+  for(var i=0;i<db.sales.length;i++){var x=db.sales[i];if(saleStatus(x)!=='closed'&&x.dueDate===TODAY) tfu.push('Payment Due: <b>'+x.n+'</b> Rs.'+saleDue(x).toFixed(2)+(x.phone?'<a class="fu-item" href="tel:'+x.phone+'"> '+x.phone+'</a>':''));}
+  g('todayFU').innerHTML=tfu.length?tfu.map(function(t){return '<div class="fu-item">'+t+'</div>';}).join(''):'<div class="empty" style="padding:8px 0"><div class="ei">&#127881;</div>No follow-ups today!</div>';
+  var odu=[];
+  for(var i=0;i<db.sales.length;i++){var x=db.sales[i];if(saleStatus(x)!=='closed'&&x.dueDate&&x.dueDate<TODAY) odu.push('<div class="fu-item">OVERDUE: <b>'+x.n+'</b>'+(x.bill?' #'+x.bill:'')+' Rs.'+saleDue(x).toFixed(2)+' since '+x.dueDate+(x.phone?'<a class="fu-item" href="tel:'+x.phone+'"> '+x.phone+'</a>':'')+'</div>');}
+  for(var i=0;i<db.payments.length;i++){var x=db.payments[i];if(!x.done&&x.d<TODAY) odu.push('<div class="fu-item">OVERDUE: <b>'+x.n+'</b> Rs.'+x.a.toFixed(2)+' since '+x.d+(x.phone?'<a class="fu-item" href="tel:'+x.phone+'"> '+x.phone+'</a>':'')+'</div>');}
+  g('overduePay').innerHTML=odu.length?odu.join(''):'<div style="font-size:12px;color:var(--green);padding:5px 0;">No overdue payments!</div>';
+}
+
+function checkReminders(){
+  var due=[];
+  for(var i=0;i<db.leads.length;i++){var x=db.leads[i];if(!x.done&&x.d<=TODAY) due.push((x.d<TODAY?'OVERDUE - ':'Today - ')+'Lead: '+x.n+(x.phone?' ('+x.phone+')':'')+(x.item?' - '+x.item:'')+' | '+x.d);}
+  for(var i=0;i<db.orders.length;i++){var x=db.orders[i];if(!x.done&&x.d<=TODAY) due.push((x.d<TODAY?'OVERDUE - ':'Today - ')+'Delivery: '+x.n+(x.phone?' ('+x.phone+')':'')+(x.item?' - '+x.item:'')+' | '+x.d);}
+  for(var i=0;i<db.sales.length;i++){var x=db.sales[i];if(saleStatus(x)!=='closed'&&x.dueDate&&x.dueDate<=TODAY) due.push((x.dueDate<TODAY?'OVERDUE - ':'Today - ')+'Payment: '+x.n+' Rs.'+saleDue(x).toFixed(2)+(x.phone?' ('+x.phone+')':'')+' | '+x.dueDate);}
+  for(var i=0;i<db.payments.length;i++){var x=db.payments[i];if(!x.done&&x.d<=TODAY) due.push((x.d<TODAY?'OVERDUE - ':'Today - ')+'Due: '+x.n+' Rs.'+x.a+(x.phone?' ('+x.phone+')':'')+' | '+x.d);}
+  if(due.length){g('remList').innerHTML=due.map(function(d){return '<li>'+d+'</li>';}).join('');g('remOv').style.display='flex';}
+  else g('remOv').style.display='none';
+}
+function closeRem(){g('remOv').style.display='none';}
+
+function genReport(){
+  var from=g('repFrom').value,to=g('repTo').value;
+  if(!from||!to){alert('Select date range.');return;}
+  var sales=db.sales.filter(function(x){return x.date>=from&&x.date<=to;});
+  var exps=db.expenses.filter(function(x){return x.date>=from&&x.date<=to;});
+  var sAmt=sales.reduce(function(s,x){return s+x.amt;},0),sDue=sales.reduce(function(s,x){return s+saleDue(x);},0),eAmt=exps.reduce(function(s,x){return s+x.a;},0),profit=sAmt-eAmt;
+  var html='<div class="card"><div class="card-title">Report: '+from+' to '+to+'</div><div class="dash-grid"><div class="tile t1"><div class="ti">&#128176;</div><div class="tv">Rs.'+sAmt.toFixed(2)+'</div><div class="tl">Sales ('+sales.length+')</div></div><div class="tile t5"><div class="ti">&#8987;</div><div class="tv">Rs.'+sDue.toFixed(2)+'</div><div class="tl">Still Due</div></div><div class="tile t6"><div class="ti">&#129534;</div><div class="tv">Rs.'+eAmt.toFixed(2)+'</div><div class="tl">Expenses</div></div><div class="tile '+(profit>=0?'t1':'t5')+'"><div class="ti">'+(profit>=0?'&#128200;':'&#128201;')+'</div><div class="tv">Rs.'+profit.toFixed(2)+'</div><div class="tl">Net Profit</div></div></div></div>';
+  g('reportOut').innerHTML=html;
+}
+
+function exportData(){
+  var rows=[['Type','Bill','Date','Customer','Phone','Item','Total','Paid','Due','Due Date','Mode','Status','Note']];
+  for(var i=0;i<db.sales.length;i++){var x=db.sales[i];rows.push(['Sale',x.bill||'',x.date,x.n,x.phone||'',x.item||'',x.amt,(x.adv||0),saleDue(x),x.dueDate||'',x.mode,saleStatus(x),x.note||'']);}
+  for(var i=0;i<db.leads.length;i++){var x=db.leads[i];rows.push(['Lead','','',x.n,x.phone||'',x.item||'','','','',x.d,x.source,x.done?'Done':x.priority,x.note||'']);}
+  for(var i=0;i<db.orders.length;i++){var x=db.orders[i];rows.push(['Order',x.linkBill||'','',x.n,x.phone||'',x.item||'','','','',x.d,'',x.done?'Delivered':'Pending',x.note||'']);}
+  for(var i=0;i<db.payments.length;i++){var x=db.payments[i];rows.push(['Payment',x.bill||'','',x.n,x.phone||'','',x.a,'',x.a,x.d,'',x.done?'Paid':'Unpaid',x.note||'']);}
+  for(var i=0;i<db.expenses.length;i++){var x=db.expenses[i];rows.push(['Expense','',x.date,'','',x.desc,x.a,'','','',x.cat,'',x.note||'']);}
+  var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('
+');
+  var blob=new Blob([csv],{type:'text/csv'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='SriSai_NoStock_'+TODAY+'.csv';a.click();
+}
+
+function clearAll(){if(confirm('Delete ALL data?')){if(confirm('Second confirmation - delete everything?'){db={sales:[],leads:[],orders:[],payments:[],expenses:[]};billCounter=1;saveDB();render();alert('All data cleared.');}}}
+
+window.showTab=showTab;window.setSaleFilter=setSaleFilter;window.setLeadFilter=setLeadFilter;
+window.calcDue=calcDue;window.toggleDelivery=toggleDelivery;
+window.addSale=addSale;window.addLead=addLead;window.addOrder=addOrder;window.addPayment=addPayment;window.addExpense=addExpense;
+window.delItem=delItem;window.collectPayment=collectPayment;
+window.markOrderDone=markOrderDone;window.markPayDone=markPayDone;window.markLeadDone=markLeadDone;
+window.callCustomer=callCustomer;window.waCustomer=waCustomer;
+window.editSaleNote=editSaleNote;window.editLeadNote=editLeadNote;window.editOrderNote=editOrderNote;
+window.showBill=showBill;window.closeBill=closeBill;window.printBill=printBill;window.sendWA=sendWA;
+window.closeRem=closeRem;window.genReport=genReport;window.exportData=exportData;window.clearAll=clearAll;
+window.render=render;
+
+</script>
+</body>
+</html>
