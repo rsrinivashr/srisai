@@ -144,43 +144,10 @@ textarea{resize:vertical;min-height:50px;}
 .edit-actions .btn{flex:1;padding:12px;font-size:13px;}
 </style>
 <script>
-// PIN stubs - work immediately before module loads
-var _pe="",_pl=false,_pa="1978",_ps="4328",_pso=null;
-function pinKey(n){
-  if(_pl)return;_pl=true;setTimeout(function(){_pl=false;},350);
-  if(_pe.length>=4)return;
-  _pe+=String(n);
-  for(var i=0;i<4;i++)document.getElementById("d"+i).className="pin-dot"+(i<_pe.length?" filled":"");
-  if(_pe.length===4)setTimeout(_chk,200);
-}
-function pinDel(){
-  if(_pl)return;_pl=true;setTimeout(function(){_pl=false;},350);
-  _pe=_pe.slice(0,-1);
-  for(var i=0;i<4;i++)document.getElementById("d"+i).className="pin-dot"+(i<_pe.length?" filled":"");
-  document.getElementById("pinErr").innerText="";
-}
-function _chk(){
-  var sp=_pso||_ps;
-  if(_pe===_pa){
-    window._isAdmin=true;
-    document.getElementById("pinScreen").style.display="none";
-    document.getElementById("roleTag").style.display="block";
-    document.getElementById("roleTag").innerText="Admin Access";
-    document.getElementById("roleBar").innerText="Logged in as: Admin";
-    var ap=document.getElementById("adminPanel");if(ap)ap.style.display="block";
-    if(window._fbStart)window._fbStart();
-  } else if(_pe===sp){
-    window._isAdmin=false;
-    document.getElementById("pinScreen").style.display="none";
-    document.getElementById("roleBar").innerText="Logged in as: Staff";
-    var ap=document.getElementById("adminPanel");if(ap)ap.style.display="none";
-    if(window._fbStart)window._fbStart();
-  } else {
-    document.getElementById("pinErr").innerText="Wrong PIN. Try again.";
-    _pe="";
-    for(var i=0;i<4;i++)document.getElementById("d"+i).className="pin-dot";
-  }
-}
+var _ADMIN_PIN="1978",_STAFF_PIN="4328",_pe="",_pl=false,_pso=null;
+function pinKey(n){if(_pl)return;_pl=true;setTimeout(function(){_pl=false;},350);if(_pe.length>=4)return;_pe+=String(n);for(var i=0;i<4;i++)document.getElementById("d"+i).className="pin-dot"+(i<_pe.length?" filled":"");if(_pe.length===4)setTimeout(_chk,200);}
+function pinDel(){if(_pl)return;_pl=true;setTimeout(function(){_pl=false;},350);_pe=_pe.slice(0,-1);for(var i=0;i<4;i++)document.getElementById("d"+i).className="pin-dot"+(i<_pe.length?" filled":"");document.getElementById("pinErr").innerText="";}
+function _chk(){var sp=_pso||_STAFF_PIN;if(_pe===_ADMIN_PIN){window._isAdmin=true;document.getElementById("pinScreen").style.display="none";document.getElementById("roleTag").style.display="block";document.getElementById("roleTag").innerText="Admin Access";document.getElementById("roleBar").innerText="Logged in as: Admin";var ap=document.getElementById("adminPanel");if(ap)ap.style.display="block";if(window._fbStart)window._fbStart();}else if(_pe===sp){window._isAdmin=false;document.getElementById("pinScreen").style.display="none";document.getElementById("roleBar").innerText="Logged in as: Staff";var ap=document.getElementById("adminPanel");if(ap)ap.style.display="none";if(window._fbStart)window._fbStart();}else{document.getElementById("pinErr").innerText="Wrong PIN. Try again.";_pe="";for(var i=0;i<4;i++)document.getElementById("d"+i).className="pin-dot";}}
 </script>
 </head>
 <body>
@@ -488,12 +455,8 @@ const DOC   = doc(dbF, "srisai", "sshn_nostock");
 // ================================================================
 // PIN SYSTEM
 // ================================================================
-let isAdmin = false;
-let staffPin = "4328";
-
-// PIN handled by global stub in <head>
-
-
+let isAdmin=false,staffPin="4328";
+// PIN handled by global script in <head>
 
 // ================================================================
 // DATA
@@ -528,9 +491,7 @@ function saveDB() {
 }
 
 function startFirebase() {
-  window._fbStart = null; // already running
-  isAdmin = window._isAdmin || false;
-  staffPin = window._pso || "4328";
+  isAdmin = window._isAdmin||false; staffPin = window._pso||"4328";
   ss("Connecting...", "syncing");
   onSnapshot(DOC, snap => {
     if (snap.exists()) {
@@ -568,7 +529,6 @@ function changePin() {
   const np2 = prompt("Re-enter new Staff PIN to confirm:");
   if (np1 !== np2) { alert("PINs do not match. Cancelled."); return; }
   staffPin = np1;
-  window._pso = np1;
   const pay = JSON.parse(JSON.stringify(db));
   pay.billCtr  = billCtr;
   pay.staffPin = staffPin;
@@ -735,7 +695,7 @@ function fg(lbl, id, val, type="text") {
   const blob=new Blob([csv],{type:"text/csv"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="SSHN_"+TODAY+".csv";a.click();
 }
 
-window._fbStart = startFirebase; // allow PIN stub to call it
+window._fbStart = startFirebase;
 // expose globals
 window.showTab=showTab;window.setSF=setSF;window.setLF=setLF;
 window.calcDue=calcDue;window.toggleDel=toggleDel;
