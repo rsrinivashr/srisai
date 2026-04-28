@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sri Sai">
+<meta name="theme-color" content="#1a2940">
+<title>Sri Sai Home Needs</title>
+<style>
+:root{--bg:#f0f2f5;--card:#fff;--hdr:#1a2940;--green:#27ae60;--blue:#2471a3;--red:#e74c3c;--purple:#7d3c98;--orange:#ca6f1e;--teal:#148f77;--amber:#d4ac0d;--text:#1c2833;--muted:#6d7a8a;--border:#dce1e8;--shadow:0 2px 10px rgba(0,0,0,.07);}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overscroll-behavior:none;}
+header{background:var(--hdr);color:#fff;padding:12px 14px 8px;text-align:center;position:sticky;top:0;z-index:60;box-shadow:0 2px 8px rgba(0,0,0,.3);}
+header h2{font-size:16px;font-weight:800;}
+header p{font-size:11px;opacity:.6;margin-top:1px;}
+#clockBar{font-size:10px;opacity:.5;margin-top:2px;}
+#savedBar{font-size:10px;margin-top:2px;color:#a9dfbf;}
+.wrap{padding:10px;padding-bottom:78px;}
+.section{display:none;}.section.active{display:block;}
+.card{background:var(--card);border-radius:12px;padding:13px;margin-bottom:10px;box-shadow:var(--shadow);}
+.card-title{font-size:13px;font-weight:800;margin-bottom:10px;}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.tile{border-radius:11px;padding:12px 10px;color:#fff;}
+.tile .ti{font-size:20px;margin-bottom:3px;}
+.tile .tv{font-size:19px;font-weight:900;line-height:1;}
+.tile .tl{font-size:10px;opacity:.85;margin-top:2px;}
+.t1{background:linear-gradient(135deg,#1e8449,#27ae60);}
+.t2{background:linear-gradient(135deg,#b7950b,#d4ac0d);color:#333;}.t2 .tl{color:#555;}
+.t3{background:linear-gradient(135deg,#1a5276,#2471a3);}
+.t4{background:linear-gradient(135deg,#6c3483,#7d3c98);}
+.t5{background:linear-gradient(135deg,#c0392b,#e74c3c);}
+.t6{background:linear-gradient(135deg,#0e6655,#148f77);}
+.t7{background:linear-gradient(135deg,#784212,#ca6f1e);}
+.t8{background:linear-gradient(135deg,#1a2940,#2c3e50);}
+.profit-pill{border-radius:9px;padding:8px 12px;font-size:12px;font-weight:800;text-align:center;margin-bottom:10px;}
+.fg{margin-bottom:8px;}
+.fg label{font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px;}
+input,select,textarea{width:100%;padding:9px 11px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;color:var(--text);background:#f9fafb;touch-action:manipulation;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);background:#fff;}
+textarea{resize:vertical;min-height:50px;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.btn{padding:10px 13px;border:none;border-radius:9px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;touch-action:manipulation;user-select:none;}
+.btn-save{background:var(--teal);width:100%;padding:13px;font-size:15px;margin-top:4px;}
+.btn-blue{background:var(--blue);}.btn-del{background:var(--red);}.btn-done{background:var(--green);}
+.btn-call{background:var(--orange);}.btn-wa{background:#25d366;}
+.btn-exp{background:var(--hdr);width:100%;padding:12px;font-size:13px;}
+.btn-clr{background:var(--red);width:100%;padding:10px;font-size:12px;margin-top:6px;}
+.row-btn{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap;}
+.rec{background:var(--card);border-radius:11px;padding:12px;margin-bottom:9px;box-shadow:var(--shadow);border-left:4px solid var(--teal);}
+.rec.lead-r{border-left-color:var(--blue);}.rec.order-r{border-left-color:var(--purple);}
+.rec.pay-r{border-left-color:var(--red);}.rec.exp-r{border-left-color:var(--orange);}
+.rec.closed-r{border-left-color:#bdc3c7;opacity:.7;}.rec.inprog-r{border-left-color:var(--amber);}
+.rec-name{font-weight:800;font-size:14px;}
+.rec-sub{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5;}
+.note-chip{font-size:11px;color:var(--muted);background:#f0f3f7;border-radius:5px;padding:3px 7px;margin-top:4px;display:inline-block;}
+.badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;margin-left:4px;}
+.b-closed{background:#eafaf1;color:var(--green);}.b-pending{background:#fdecea;color:var(--red);}
+.b-overdue{background:#fdecea;color:var(--red);}.b-today{background:#fef9e7;color:var(--orange);}
+.b-partial{background:#ebf5fb;color:var(--blue);}
+.pay-bar-wrap{margin:6px 0 2px;background:#ecf0f1;border-radius:20px;height:6px;overflow:hidden;}
+.pay-bar-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,#27ae60,#1e8449);}
+.sw{margin-bottom:8px;position:relative;}.sw input{padding-left:30px;}
+.sw .si{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:14px;}
+.sum-row{background:#ebf5fb;border-radius:8px;padding:7px 10px;margin-bottom:8px;font-size:12px;}
+.sum-row span{font-weight:800;color:var(--blue);}
+.tabs{position:fixed;bottom:0;left:0;right:0;display:flex;z-index:100;box-shadow:0 -2px 8px rgba(0,0,0,.15);}
+.tabs button{flex:1;padding:9px 1px 7px;border:none;color:#fff;font-size:8.5px;font-weight:800;cursor:pointer;background:#34495e;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:1px;touch-action:manipulation;user-select:none;}
+.tabs button .ti{font-size:17px;line-height:1;}
+.tabs button:nth-child(1){background:#1a2940;}
+.tabs button:nth-child(2){background:#1e8449;}
+.tabs button:nth-child(3){background:#1a5276;}
+.tabs button:nth-child(4){background:#6c3483;}
+.tabs button:nth-child(5){background:#c0392b;}
+.tabs button:nth-child(6){background:#784212;}
+.tabs button:nth-child(7){background:#2c3e50;}
+.tabs button.active{filter:brightness(1.4);outline:3px solid rgba(255,255,255,.6);}
+#remOv{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);z-index:500;align-items:center;justify-content:center;}
+#remOv.show{display:flex;}
+#remBox{background:#fff;border-radius:14px;padding:16px;width:90%;max-width:380px;box-shadow:0 8px 24px rgba(0,0,0,.25);max-height:80vh;overflow-y:auto;}
+#remBox h3{color:var(--orange);font-size:16px;margin-bottom:5px;}
+#remBox ul{padding-left:15px;margin:7px 0;}
+#remBox li{margin-bottom:6px;font-size:12px;line-height:1.5;}
+.rem-ok{background:var(--green);color:#fff;border:none;border-radius:8px;padding:11px;width:100%;font-size:14px;font-weight:700;cursor:pointer;margin-top:9px;font-family:inherit;touch-action:manipulation;}
+.empty{text-align:center;padding:24px 0;color:var(--muted);font-size:13px;}
+.empty .ei{font-size:30px;margin-bottom:6px;}
+.due-box{background:#fef9e7;border:1.5px solid #f7dc6f;border-radius:9px;padding:9px;margin:7px 0;}
+.due-title{font-size:11px;font-weight:700;color:#b7950b;margin-bottom:6px;text-transform:uppercase;}
+.fu-item{padding:6px 0;border-bottom:1px solid #ecf0f1;font-size:12px;line-height:1.5;}
+.fu-item:last-child{border-bottom:none;}
+.fu-item a{color:var(--orange);text-decoration:none;font-weight:700;}
+.order-tag{font-size:11px;background:#f4ecf7;color:var(--purple);border-radius:5px;padding:2px 6px;margin-top:3px;display:inline-block;font-weight:700;}
+.filter-pills{display:flex;gap:5px;margin-bottom:8px;flex-wrap:wrap;}
+.pill{padding:5px 11px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-family:inherit;color:var(--muted);touch-action:manipulation;}
+.pill.on{background:var(--hdr);color:#fff;border-color:var(--hdr);}
+#billOv{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:600;align-items:center;justify-content:center;}
+#billOv.show{display:flex;}
+#billBox{background:#fff;border-radius:13px;width:93%;max-width:400px;box-shadow:0 8px 28px rgba(0,0,0,.35);max-height:88vh;overflow-y:auto;}
+#billContent{padding:16px;font-size:12px;}
+#billContent h3{text-align:center;font-size:15px;margin-bottom:2px;}
+.biz-sub{text-align:center;font-size:11px;color:var(--muted);margin-bottom:10px;}
+.bill-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f0f0f0;font-size:12px;}
+.bill-total{display:flex;justify-content:space-between;padding:6px 0;font-weight:900;font-size:13px;border-top:2px solid var(--hdr);margin-top:3px;}
+.bill-actions{display:flex;gap:7px;padding:10px 14px;border-top:1px solid var(--border);}
+.bill-actions .btn{flex:1;padding:10px;font-size:12px;}
+.sdot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#a9dfbf;margin-right:4px;vertical-align:middle;}
+.sdot.syn{background:#f39c12;animation:pu 1s infinite;}
+.sdot.err{background:var(--red);}
+@keyframes pu{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+.pin-dot{width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,.25);transition:background .2s;}
+.pin-dot.filled{background:#fff;}
+.pin-btn{background:rgba(255,255,255,.12);border:none;border-radius:12px;color:#fff;font-size:22px;font-weight:700;padding:18px;cursor:pointer;font-family:inherit;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;}
+.pin-btn:active{background:rgba(255,255,255,.28);}
+
+/* EDIT OVERLAY */
+#editOv{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:700;overflow-y:auto;padding:20px 10px;}
+#editOv.show{display:block;}
+#editBox{background:#fff;border-radius:14px;width:100%;max-width:440px;margin:0 auto;box-shadow:0 8px 28px rgba(0,0,0,.35);padding:16px;}
+#editBox h3{font-size:15px;font-weight:800;margin-bottom:12px;color:#1a2940;border-bottom:2px solid #f0f2f5;padding-bottom:8px;}
+.edit-row{display:flex;gap:8px;}
+.edit-row .fg{flex:1;}
+.edit-actions{display:flex;gap:8px;margin-top:14px;}
+.edit-actions button{flex:1;padding:12px;font-size:14px;}
+</style>
+<script>
+var _ADMIN_PIN = "1978";
+var _STAFF_PIN = "4328";
+var _pe = "";
+var _pl = false;
+var _pso = null;
+
+function pinKey(n) {
+  if (_pl) return;
+  _pl = true;
+  setTimeout(function(){ _pl = false; }, 350);
+  if (_pe.length >= 4) return;
+  _pe += String(n);
+  for (var i = 0; i < 4; i++)
+    document.getElementById("d"+i).className = "pin-dot" + (i < _pe.length ? " filled" : "");
+  if (_pe.length === 4) setTimeout(_chk, 200);
+}
+
+function pinDel() {
+  if (_pl) return;
+  _pl = true;
+  setTimeout(function(){ _pl = false; }, 350);
+  _pe = _pe.slice(0, -1);
+  for (var i = 0; i < 4; i++)
+    document.getElementById("d"+i).className = "pin-dot" + (i < _pe.length ? " filled" : "");
+  document.getElementById("pinErr").innerText = "";
+}
+
+function _chk() {
+  var sp = _pso || _STAFF_PIN;
+  if (_pe === _ADMIN_PIN) {
+    window._isAdmin = true;
+    document.getElementById("pinScreen").style.display = "none";
+    if (document.getElementById("roleTag")) {
+      document.getElementById("roleTag").style.display = "block";
+      document.getElementById("roleTag").innerText = "Admin Access";
+    }
+    if (document.getElementById("roleBar"))
+      document.getElementById("roleBar").innerText = "Logged in as: Admin";
+    var ap = document.getElementById("adminPanel");
+    if (ap) ap.style.display = "block";
+  } else if (_pe === sp) {
+    window._isAdmin = false;
+    document.getElementById("pinScreen").style.display = "none";
+    if (document.getElementById("roleBar"))
+      document.getElementById("roleBar").innerText = "Logged in as: Staff";
+    var ap = document.getElementById("adminPanel");
+    if (ap) ap.style.display = "none";
+  } else {
+    document.getElementById("pinErr").innerText = "Wrong PIN. Try again.";
+    _pe = "";
+    for (var i = 0; i < 4; i++)
+      document.getElementById("d"+i).className = "pin-dot";
+  }
+}
+</script>
+</head>
+<body>
+<!-- PIN SCREEN -->
+<div id="pinScreen" style="position:fixed;top:0;left:0;right:0;bottom:0;background:#1a2940;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;">
+  <h2 style="color:#fff;font-size:20px;margin-bottom:6px;font-weight:800;">&#x1FA91; Sri Sai Home Needs</h2>
+  <p style="color:rgba(255,255,255,.6);font-size:13px;margin-bottom:28px;">Enter PIN to continue</p>
+  <div style="display:flex;gap:16px;margin-bottom:28px;">
+    <div class="pin-dot" id="d0"></div>
+    <div class="pin-dot" id="d1"></div>
+    <div class="pin-dot" id="d2"></div>
+    <div class="pin-dot" id="d3"></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:240px;">
+    <button class="pin-btn" onclick="pinKey(1)">1</button>
+    <button class="pin-btn" onclick="pinKey(2)">2</button>
+    <button class="pin-btn" onclick="pinKey(3)">3</button>
+    <button class="pin-btn" onclick="pinKey(4)">4</button>
+    <button class="pin-btn" onclick="pinKey(5)">5</button>
+    <button class="pin-btn" onclick="pinKey(6)">6</button>
+    <button class="pin-btn" onclick="pinKey(7)">7</button>
+    <button class="pin-btn" onclick="pinKey(8)">8</button>
+    <button class="pin-btn" onclick="pinKey(9)">9</button>
+    <button class="pin-btn" style="grid-column:2;" onclick="pinKey(0)">0</button>
+    <button class="pin-btn" style="background:rgba(231,76,60,.35);" onclick="pinDel()">&#9003;</button>
+  </div>
+  <div id="pinErr" style="color:#e74c3c;font-size:13px;margin-top:12px;min-height:18px;font-weight:700;"></div>
+</div>
+
+
+<header>
+  <h2>Sri Sai Home Needs</h2>
+  <p>Furniture Shop, Chandanagar</p>
+  <div id="clockBar"></div>
+  <div id="savedBar"><span class="sdot" id="sdot"></span><span id="smsg">Connecting...</span></div>
+</header>
+
+<div class="wrap">
+
+<!-- HOME -->
+<div id="home" class="section active">
+  <div class="dash-grid">
+    <div class="tile t2"><div class="ti">&#128197;</div><div class="tv">&#8377;<span id="dTodaySales">0</span></div><div class="tl">Today Sales</div></div>
+    <div class="tile t1"><div class="ti">&#128176;</div><div class="tv">&#8377;<span id="dTotalSales">0</span></div><div class="tl">Total Sales</div></div>
+    <div class="tile t5"><div class="ti">&#8987;</div><div class="tv">&#8377;<span id="dTotalDue">0</span></div><div class="tl">Total Due</div></div>
+    <div class="tile t3"><div class="ti">&#128203;</div><div class="tv" id="dLeads">0</div><div class="tl">Active Leads</div></div>
+    <div class="tile t4"><div class="ti">&#128230;</div><div class="tv" id="dOrders">0</div><div class="tl">Pending Orders</div></div>
+    <div class="tile t6"><div class="ti">&#129534;</div><div class="tv">&#8377;<span id="dExpenses">0</span></div><div class="tl">Expenses</div></div>
+    <div class="tile t7"><div class="ti">&#128722;</div><div class="tv" id="dInprog">0</div><div class="tl">In-Progress</div></div>
+    <div class="tile t8"><div class="ti">&#9989;</div><div class="tv" id="dClosed">0</div><div class="tl">Closed Sales</div></div>
+  </div>
+  <div class="profit-pill" id="profitPill">Net Profit: &#8377;0</div>
+  <div class="card"><div class="card-title">Today Follow-ups</div><div id="todayFU"></div></div>
+  <div class="card"><div class="card-title">Overdue Payments</div><div id="overduePay"></div></div>
+  <div class="card"><div class="card-title">Quick Summary</div><div id="quickSummary" style="font-size:12px;line-height:2;"></div></div>
+  <button class="btn btn-exp" id="btnExport">Export Full Report to Excel</button>
+</div>
+
+<!-- SALES -->
+<div id="sales" class="section">
+  <div class="card">
+    <div class="card-title">New Sale</div>
+    <div class="row2">
+      <div class="fg"><label>Bill No. (auto if blank)</label><input id="sBill" placeholder="Leave blank = auto"></div>
+      <div class="fg"><label>Sale Date</label><input id="sDate" type="date"></div>
+    </div>
+    <div class="fg"><label>Customer Name *</label><input id="sName" placeholder="Customer name"></div>
+    <div class="row2">
+      <div class="fg"><label>Phone</label><input id="sPhone" type="tel" placeholder="Mobile number"></div>
+      <div class="fg"><label>Payment Mode</label>
+        <select id="sMode">
+          <option value="Cash">Cash</option><option value="UPI">UPI</option><option value="Card">Card</option>
+          <option value="Credit/EMI">Credit/EMI</option><option value="Cheque">Cheque</option><option value="Mixed">Mixed</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg"><label>Item / Product</label><input id="sItem" placeholder="e.g. Sofa 3-seater, King bed"></div>
+    <div class="fg"><label>Total Sale Amount (&#8377;) *</label><input id="sAmt" type="number" placeholder="0"></div>
+    <div class="due-box">
+      <div class="due-title">Advance and Due Details</div>
+      <div class="row2">
+        <div class="fg"><label>Advance Paid (&#8377;)</label><input id="sAdv" type="number" placeholder="0"></div>
+        <div class="fg"><label>Balance Due (&#8377;)</label><input id="sDue" type="number" placeholder="0" readonly style="background:#fff3cd;font-weight:800;color:#7d6608;"></div>
+      </div>
+      <div class="fg"><label>Payment Due Date</label><input id="sDueDate" type="date"></div>
+    </div>
+    <div class="fg"><label>Delivery Needed?</label>
+      <select id="sDelivery">
+        <option value="no">No - Customer Pickup</option>
+        <option value="yes">Yes - Home Delivery</option>
+      </select>
+    </div>
+    <div id="deliveryFields" style="display:none;">
+      <div class="fg"><label>Delivery Date</label><input id="sDelDate" type="date"></div>
+      <div class="fg"><label>Delivery Address</label><input id="sDelAddr" placeholder="Full delivery address"></div>
+    </div>
+    <div class="fg"><label>Note</label><textarea id="sNote" placeholder="Any remarks..."></textarea></div>
+    <button class="btn btn-save" id="btnAS">Save Sale</button>
+  </div>
+  <div class="filter-pills">
+    <button class="pill on" data-sf="all">All</button>
+    <button class="pill" data-sf="inprog">In-Progress</button>
+    <button class="pill" data-sf="closed">Closed</button>
+    <button class="pill" data-sf="overdue">Overdue</button>
+  </div>
+  <div class="sw"><span class="si">&#128269;</span><input id="searchSales" placeholder="Search sales..."></div>
+  <div class="sum-row">Showing: <span id="sScount">0</span> &nbsp;|&nbsp; Total: &#8377;<span id="sSamt">0</span> &nbsp;|&nbsp; Due: &#8377;<span id="sSDue">0</span></div>
+  <div id="salesList"></div>
+</div>
+
+<!-- LEADS -->
+<div id="leads" class="section">
+  <div class="card">
+    <div class="card-title">New Lead</div>
+    <div class="fg"><label>Customer Name *</label><input id="lName" placeholder="Customer name"></div>
+    <div class="row2">
+      <div class="fg"><label>Phone *</label><input id="lPhone" type="tel" placeholder="Mobile number"></div>
+      <div class="fg"><label>Follow-up Date *</label><input id="lDate" type="date"></div>
+    </div>
+    <div class="fg"><label>Interested In</label><input id="lItem" placeholder="e.g. Sofa, Wardrobe"></div>
+    <div class="row2">
+      <div class="fg"><label>Est. Budget (&#8377;)</label><input id="lBudget" type="number" placeholder="0"></div>
+      <div class="fg"><label>Source</label>
+        <select id="lSource">
+          <option>Walk-in</option><option>Referral</option><option>Social Media</option>
+          <option>Phone Enquiry</option><option>IM Lead</option><option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg"><label>Priority</label>
+      <select id="lPriority"><option value="Hot">Hot</option><option value="Warm" selected>Warm</option><option value="Cold">Cold</option></select>
+    </div>
+    <div class="fg"><label>Note</label><textarea id="lNote" placeholder="Any remarks..."></textarea></div>
+    <button class="btn btn-save" id="btnAL">Save Lead</button>
+  </div>
+  <div class="filter-pills">
+    <button class="pill on" data-lf="all">All</button>
+    <button class="pill" data-lf="Hot">Hot</button>
+    <button class="pill" data-lf="Warm">Warm</button>
+    <button class="pill" data-lf="Cold">Cold</button>
+    <button class="pill" data-lf="due">Due Today</button>
+  </div>
+  <div class="sw"><span class="si">&#128269;</span><input id="searchLeads" placeholder="Search leads..."></div>
+  <div id="leadList"></div>
+</div>
+
+<!-- ORDERS -->
+<div id="orders" class="section">
+  <div class="card">
+    <div class="card-title">New Delivery Order</div>
+    <div class="fg"><label>Customer Name *</label><input id="oName" placeholder="Customer name"></div>
+    <div class="row2">
+      <div class="fg"><label>Phone</label><input id="oPhone" type="tel" placeholder="Mobile number"></div>
+      <div class="fg"><label>Delivery Date *</label><input id="oDate" type="date"></div>
+    </div>
+    <div class="fg"><label>Item / Product</label><input id="oItem" placeholder="Items to be delivered"></div>
+    <div class="fg"><label>Delivery Address</label><input id="oAddr" placeholder="Full delivery address"></div>
+    <div class="fg"><label>Linked Bill No.</label><input id="oLinkBill" placeholder="e.g. INV-001"></div>
+    <div class="fg"><label>Note</label><textarea id="oNote" placeholder="Any delivery instructions..."></textarea></div>
+    <button class="btn btn-save" id="btnAO">Save Order</button>
+  </div>
+  <div class="sw"><span class="si">&#128269;</span><input id="searchOrders" placeholder="Search orders..."></div>
+  <div id="orderList"></div>
+</div>
+
+<!-- PAYMENTS -->
+<div id="payments" class="section">
+  <div class="card" style="background:#fef9e7;border:1.5px solid #f7dc6f;">
+    <div class="card-title">Pending Due Payments</div>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:7px;">Auto-tracked from Sales with balance due.</p>
+    <div id="autoDueList"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Add Standalone Payment Due</div>
+    <div class="fg"><label>Customer Name *</label><input id="pName" placeholder="Customer name"></div>
+    <div class="row2">
+      <div class="fg"><label>Phone</label><input id="pPhone" type="tel" placeholder="Mobile number"></div>
+      <div class="fg"><label>Amount Due (&#8377;) *</label><input id="pAmt" type="number" placeholder="0"></div>
+    </div>
+    <div class="row2">
+      <div class="fg"><label>Due Date *</label><input id="pDate" type="date"></div>
+      <div class="fg"><label>Bill / Ref No.</label><input id="pBill" placeholder="Reference"></div>
+    </div>
+    <div class="fg"><label>Note</label><textarea id="pNote" placeholder="Any remarks..."></textarea></div>
+    <button class="btn btn-save" id="btnAP">Save Payment Due</button>
+  </div>
+  <div class="sw"><span class="si">&#128269;</span><input id="searchPay" placeholder="Search payments..."></div>
+  <div class="sum-row">Standalone Pending: &#8377;<span id="payPendTot">0</span></div>
+  <div id="payList"></div>
+</div>
+
+<!-- EXPENSES -->
+<div id="expenses" class="section">
+  <div class="card">
+    <div class="card-title">Add Expense</div>
+    <div class="row2">
+      <div class="fg"><label>Category</label>
+        <select id="eCat">
+          <option>Transport</option><option>Salary</option><option>Rent</option><option>Electricity</option>
+          <option>Stock Purchase</option><option>Maintenance</option><option>Marketing</option><option>Other</option>
+        </select>
+      </div>
+      <div class="fg"><label>Amount (&#8377;) *</label><input id="eAmt" type="number" placeholder="0"></div>
+    </div>
+    <div class="fg"><label>Description *</label><input id="eDesc" placeholder="e.g. Auto fare, Staff salary"></div>
+    <div class="fg"><label>Note</label><textarea id="eNote" placeholder="Optional details..."></textarea></div>
+    <button class="btn btn-save" id="btnAE">Save Expense</button>
+  </div>
+  <div class="sw"><span class="si">&#128269;</span><input id="searchExp" placeholder="Search expenses..."></div>
+  <div class="sum-row">Total shown: &#8377;<span id="expTot">0</span></div>
+  <div id="expList"></div>
+</div>
+
+<!-- REPORTS -->
+<div id="reports" class="section">
+  <div class="card">
+    <div class="card-title">Date-wise Report</div>
+    <div class="row2">
+      <div class="fg"><label>From</label><input type="date" id="repFrom"></div>
+      <div class="fg"><label>To</label><input type="date" id="repTo"></div>
+    </div>
+    <button class="btn btn-save" id="btnRep" style="background:var(--blue);">Generate Report</button>
+  </div>
+  <div id="reportOut"></div>
+  <button class="btn btn-exp" id="btnExport2" style="margin-top:6px;">Export All Data to Excel</button>
+  <button class="btn btn-clr" id="btnClr">Clear ALL Data</button>
+</div>
+
+</div>
+
+<!-- EDIT OVERLAY -->
+<div id="editOv">
+  <div id="editBox">
+    <h3 id="editTitle">&#9998; Edit Record</h3>
+    <div id="editFields"></div>
+    <div class="edit-actions">
+      <button class="btn" style="background:#148f77;" onclick="saveEdit()">&#10003; Save Changes</button>
+      <button class="btn" style="background:#6d7a8a;" onclick="closeEdit()">&#10005; Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button data-tab="home" class="active"><span class="ti">&#127968;</span>Home</button>
+  <button data-tab="sales"><span class="ti">&#128176;</span>Sales</button>
+  <button data-tab="leads"><span class="ti">&#128203;</span>Leads</button>
+  <button data-tab="orders"><span class="ti">&#128230;</span>Orders</button>
+  <button data-tab="payments"><span class="ti">&#128184;</span>Pay</button>
+  <button data-tab="expenses"><span class="ti">&#129534;</span>Expense</button>
+  <button data-tab="reports"><span class="ti">&#128202;</span>Reports</button>
+</div>
+
+<!-- REMINDER -->
+<div id="remOv">
+  <div id="remBox">
+    <h3>Today Reminders</h3>
+    <p style="font-size:11px;color:#666;">Items needing attention:</p>
+    <ul id="remList"></ul>
+    <button class="rem-ok" id="btnROk">OK Got It!</button>
+  </div>
+</div>
+
+<!-- BILL -->
+<div id="billOv">
+  <div id="billBox">
+    <div id="billContent"></div>
+    <div class="bill-actions">
+      <button class="btn btn-wa"   id="btnWA">WhatsApp Bill</button>
+      <button class="btn btn-blue" id="btnPrint">Print / PDF</button>
+      <button class="btn" style="background:var(--muted);" id="btnCB">Close</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp }   from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCNgXCLNfs08QfrAzip8LUCOossRE3usUQ",
+  authDomain: "ourstore-4bc0c.firebaseapp.com",
+  projectId: "ourstore-4bc0c",
+  storageBucket: "ourstore-4bc0c.firebasestorage.app",
+  messagingSenderId: "526211549396",
+  appId: "1:526211549396:web:6ce8a6daf6ad10b3b39341"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const fdb   = getFirestore(fbApp);
+const DOC   = doc(fdb, "srisai", "data_no_stock");
+
+let db = { sales:[], leads:[], orders:[], payments:[], expenses:[] };
+const TODAY = new Date().toISOString().split("T")[0];
+let billCounter = 100000;
+let curBillIdx  = -1;
+let saleFilter  = "all";
+let leadFilter  = "all";
+let saveTimer   = null;
+
+const g = id => document.getElementById(id);
+
+function ss(msg, cls) {
+  g("smsg").textContent = msg;
+  g("sdot").className = "sdot" + (cls ? " " + cls : "");
+}
+
+function saveDB() {
+  try { localStorage.setItem("srisai_ns2", JSON.stringify({db, billCounter})); } catch(e){}
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    ss("Saving...", "syn");
+    const p = JSON.parse(JSON.stringify(db));
+    p.billCounter = billCounter;
+    setDoc(DOC, p)
+      .then(() => ss("Synced " + new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"}), ""))
+      .catch(e => { ss("Sync failed", "err"); console.error(e); });
+  }, 800);
+}
+
+ss("Connecting...", "syn");
+onSnapshot(DOC, snap => {
+  if (snap.exists()) {
+    const p = snap.data();
+    db.sales    = p.sales    || [];
+    db.leads    = p.leads    || [];
+    db.orders   = p.orders   || [];
+    db.payments = p.payments || [];
+    db.expenses = p.expenses || [];
+    if (p.billCounter) billCounter = p.billCounter;
+    ss("Synced " + new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"}), "");
+  } else {
+    try { const r=localStorage.getItem("srisai_ns2"); if(r){const q=JSON.parse(r);db=q.db;billCounter=q.billCounter||100000;} } catch(e){}
+    ss("Ready", "");
+  }
+  render(); checkRem();
+}, err => {
+  try { const r=localStorage.getItem("srisai_ns2"); if(r){const q=JSON.parse(r);db=q.db;billCounter=q.billCounter||100000;} } catch(e){}
+  ss("Offline - local data", "err");
+  render();
+  console.error(err);
+});
+
+function genBill() { return "SSHN" + String(billCounter++); }
+function stOf(s) { const t=s.amt||0,a=s.adv||0; if(t<=0||a>=t)return"closed"; if(a>0)return"inprog"; return"pending"; }
+function due(s) { return Math.max(0,(s.amt||0)-(s.adv||0)); }
+function dbadge(d) {
+  if(!d)return"";
+  if(d<TODAY)return'<span class="badge b-overdue">Overdue</span>';
+  if(d===TODAY)return'<span class="badge b-today">Today</span>';
+  return"";
+}
+function pcolor(p) { return p==="Hot"?"#e74c3c":p==="Warm"?"#d4ac0d":"#2471a3"; }
+function esc(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function filt(arr, sid) {
+  const q = (g(sid)?.value||"").trim().toLowerCase();
+  if(!q) return arr;
+  return arr.filter(x =>
+    (x.n    &&x.n.toLowerCase().includes(q))||
+    (x.phone&&x.phone.includes(q))||
+    (x.bill &&x.bill.toLowerCase().includes(q))||
+    (x.item &&x.item.toLowerCase().includes(q))||
+    (x.desc &&x.desc.toLowerCase().includes(q))
+  );
+}
+
+function tickClock() {
+  g("clockBar").textContent =
+    new Date().toLocaleDateString("en-IN",{weekday:"short",day:"2-digit",month:"short"}) + "  -  " +
+    new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});
+}
+setInterval(tickClock,1000); tickClock();
+
+let tlk=false;
+function showTab(id) {
+  if(tlk)return; tlk=true; setTimeout(()=>tlk=false,300);
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  g(id).classList.add("active");
+  document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
+  document.querySelector(`.tabs button[data-tab="${id}"]`).classList.add("active");
+  render();
+}
+document.querySelectorAll(".tabs button").forEach(btn => {
+  btn.addEventListener("touchstart", e => { e.preventDefault(); showTab(btn.dataset.tab); }, {passive:false});
+  btn.addEventListener("click", () => showTab(btn.dataset.tab));
+});
+
+document.querySelectorAll(".pill[data-sf]").forEach(b => {
+  b.addEventListener("click", () => {
+    saleFilter=b.dataset.sf;
+    document.querySelectorAll(".pill[data-sf]").forEach(x=>x.classList.remove("on"));
+    b.classList.add("on"); render();
+  });
+});
+document.querySelectorAll(".pill[data-lf]").forEach(b => {
+  b.addEventListener("click", () => {
+    leadFilter=b.dataset.lf;
+    document.querySelectorAll(".pill[data-lf]").forEach(x=>x.classList.remove("on"));
+    b.classList.add("on"); render();
+  });
+});
+["searchSales","searchLeads","searchOrders","searchPay","searchExp"].forEach(id=>g(id).addEventListener("input",render));
+g("sDelivery").addEventListener("change",()=>{ g("deliveryFields").style.display=g("sDelivery").value==="yes"?"block":"none"; });
+function calcDue(){const t=parseFloat(g("sAmt").value)||0,a=parseFloat(g("sAdv").value)||0;g("sDue").value=Math.max(0,t-a)>0?Math.max(0,t-a).toFixed(2):"";}
+g("sAmt").addEventListener("input",calcDue);
+g("sAdv").addEventListener("input",calcDue);
+
+function addSale(){
+  const name=g("sName").value.trim(),amt=parseFloat(g("sAmt").value)||0;
+  const item=g("sItem").value.trim();
+  if(!name){alert("Customer Name required.");return;}
+  if(!item){alert("Item / Product is required.");return;}
+  if(amt<=0){alert("Sale Amount required.");return;}
+  const adv=parseFloat(g("sAdv").value)||0,d=Math.max(0,amt-adv),dd=g("sDueDate").value,del=g("sDelivery").value==="yes";
+  if(d>0&&!dd){if(!confirm("Balance due Rs."+d.toFixed(2)+" but no Due Date. Continue?"))return;}
+  const bill=g("sBill").value.trim()||genBill();
+  const sale={bill,date:g("sDate").value||TODAY,n:name,phone:g("sPhone").value.trim(),mode:g("sMode").value,
+    item:g("sItem").value.trim(),amt,adv,dueDate:dd,note:g("sNote").value.trim(),delivery:del,
+    delDate:del?g("sDelDate").value:"",delAddr:del?g("sDelAddr").value.trim():""};
+  db.sales.push(sale);
+  if(del&&sale.delDate) db.orders.push({n:name,phone:sale.phone,item:sale.item,d:sale.delDate,addr:sale.delAddr,linkBill:bill,note:"Auto from Sale #"+bill,done:false});
+  ["sBill","sName","sPhone","sItem","sAmt","sAdv","sDue","sDueDate","sNote","sDelDate","sDelAddr"].forEach(id=>g(id).value="");
+  g("sDate").value="";g("sMode").value="Cash";g("sDelivery").value="no";g("deliveryFields").style.display="none";
+  const si=db.sales.length-1;
+  saveDB();render();checkRem();
+  if(confirm("Sale saved! Bill: "+bill+"\n\nShow bill preview?"))showBill(si);
+}
+function addLead(){
+  const name=g("lName").value.trim(),date=g("lDate").value;
+  if(!name||!date){alert("Name and Follow-up Date required.");return;}
+  db.leads.push({n:name,phone:g("lPhone").value.trim(),item:g("lItem").value.trim(),d:date,
+    budget:parseFloat(g("lBudget").value)||0,source:g("lSource").value,priority:g("lPriority").value,note:g("lNote").value.trim(),done:false});
+  ["lName","lPhone","lItem","lDate","lBudget","lNote"].forEach(id=>g(id).value="");
+  saveDB();render();checkRem();alert("Lead saved!");
+}
+function addOrder(){
+  const name=g("oName").value.trim(),date=g("oDate").value;
+  if(!name||!date){alert("Name and Delivery Date required.");return;}
+  db.orders.push({n:name,phone:g("oPhone").value.trim(),item:g("oItem").value.trim(),d:date,
+    addr:g("oAddr").value.trim(),linkBill:g("oLinkBill").value.trim(),note:g("oNote").value.trim(),done:false});
+  ["oName","oPhone","oItem","oDate","oAddr","oLinkBill","oNote"].forEach(id=>g(id).value="");
+  saveDB();render();checkRem();alert("Order saved!");
+}
+function addPayment(){
+  const name=g("pName").value.trim(),amt=parseFloat(g("pAmt").value)||0,date=g("pDate").value;
+  if(!name||!amt||!date){alert("Name, Amount and Due Date required.");return;}
+  db.payments.push({n:name,phone:g("pPhone").value.trim(),a:amt,d:date,bill:g("pBill").value.trim(),note:g("pNote").value.trim(),done:false});
+  ["pName","pPhone","pAmt","pDate","pBill","pNote"].forEach(id=>g(id).value="");
+  saveDB();render();checkRem();alert("Payment due saved!");
+}
+function addExpense(){
+  const desc=g("eDesc").value.trim(),amt=parseFloat(g("eAmt").value)||0;
+  if(!desc||!amt){alert("Description and Amount required.");return;}
+  db.expenses.push({desc,cat:g("eCat").value,a:amt,note:g("eNote").value.trim(),date:TODAY});
+  ["eDesc","eAmt","eNote"].forEach(id=>g(id).value="");
+  saveDB();render();alert("Expense saved!");
+}
+g("btnAS").addEventListener("click",addSale);
+g("btnAL").addEventListener("click",addLead);
+g("btnAO").addEventListener("click",addOrder);
+g("btnAP").addEventListener("click",addPayment);
+g("btnAE").addEventListener("click",addExpense);
+
+function delItem(type,i){if(confirm("Delete?")){db[type].splice(i,1);saveDB();render();}}
+function collectPay(i){
+  const s=db.sales[i],d=due(s);
+  const col=parseFloat(prompt("Collecting from "+s.n+"?\n(Due: Rs."+d.toFixed(2)+")",d.toFixed(2)));
+  if(isNaN(col)||col<=0)return;
+  s.adv=Math.min((s.adv||0)+col,s.amt);
+  saveDB();render();checkRem();
+  const rem=due(s);
+  alert(rem>0?"Rs."+col.toFixed(2)+" collected. Still due: Rs."+rem.toFixed(2):"Full payment! Sale CLOSED.");
+}
+function markDone(type,i){db[type][i].done=true;saveDB();render();checkRem();}
+function callCust(phone){if(phone)window.location.href="tel:"+phone;else alert("No phone saved.");}
+function waCust(phone){
+  if(!phone){alert("No phone saved.");return;}
+  let p=phone.replace(/[^0-9]/g,"");
+  if(p.length===10)p="91"+p;
+  window.open("https://wa.me/"+p,"_blank");
+}
+function waLead(i){
+  const l=db.leads[i];
+  if(!l.phone){alert("No phone saved.");return;}
+  let msg="*Sri Sai Home Needs - Furniture Shop, Chandanagar*\nhttps://maps.app.goo.gl/5PPPGwWJW8PUs7EN6\n\n";
+  if(l.n) msg+="Customer: "+l.n+"\n";
+  if(l.item) msg+="Interested In: "+l.item+"\n";
+  if(l.budget) msg+="Budget: Rs."+l.budget+"\n";
+  if(l.d) msg+="Follow-up Date: "+l.d+"\n";
+  msg+="\n";
+  let p=l.phone.replace(/[^0-9]/g,"");
+  if(p.length===10)p="91"+p;
+  window.open("https://wa.me/"+p+"?text="+encodeURIComponent(msg),"_blank");
+}
+
+function waOrder(i){
+  const o=db.orders[i];
+  if(!o.phone){alert("No phone saved.");return;}
+  let msg="*Sri Sai Home Needs - Furniture Shop, Chandanagar*\nhttps://maps.app.goo.gl/5PPPGwWJW8PUs7EN6\n\n";
+  if(o.n) msg+="Customer: "+o.n+"\n";
+  if(o.item) msg+="Item: "+o.item+"\n";
+  if(o.d) msg+="Delivery Date: "+o.d+"\n";
+  if(o.addr) msg+="Address: "+o.addr+"\n";
+  if(o.linkBill) msg+="Bill Ref: "+o.linkBill+"\n";
+  msg+="\n";
+  let p=o.phone.replace(/[^0-9]/g,"");
+  if(p.length===10)p="91"+p;
+  window.open("https://wa.me/"+p+"?text="+encodeURIComponent(msg),"_blank");
+}
+
+function waPayment(i){const x=db.payments[i];if(!x.phone){alert("No phone number for this payment.");return;}const extra=prompt("Add custom message (optional):","")||"";const msg="*Sri Sai Home Needs - Payment Reminder*\n\nDear "+x.n+",\n\nThis is a reminder that *Rs."+x.a.toFixed(2)+"* is due on *"+x.d+"*."+(x.bill?"\n\nReference: "+x.bill:"")+(extra?"\n\n"+extra:"")+"\n\nPlease pay at your earliest. Thank you!\n\nFind us: https://maps.app.goo.gl/5PPPGwWJW8PUs7EN6\nSri Sai Home Needs, Chandanagar";const p=x.phone.replace(/[^0-9]/g,"");window.open("https://wa.me/"+(p.length===10?"91"+p:p)+"?text="+encodeURIComponent(msg),"_blank");}
+
+function editSN(i){const s=db.sales[i],n=prompt("Edit Note:",s.note||"");if(n!==null){s.note=n;saveDB();render();}}
+function editLN(i){
+  const l=db.leads[i];
+  const d=prompt("Edit Follow-up Date (YYYY-MM-DD):",l.d);if(d?.trim())l.d=d.trim();
+  const n=prompt("Edit Note:",l.note||"");if(n!==null)l.note=n;
+  saveDB();render();checkRem();
+}
+function editON(i){
+  const o=db.orders[i];
+  const d=prompt("Edit Delivery Date (YYYY-MM-DD):",o.d);if(d?.trim())o.d=d.trim();
+  const n=prompt("Edit Note:",o.note||"");if(n!==null)o.note=n;
+  saveDB();render();checkRem();
+}
+
+window.delItem=delItem;window.collectPay=collectPay;window.markDone=markDone;
+window.callCust=callCust;window.waCust=waCust;window.waLead=waLead;window.waOrder=waOrder;window.waPayment=waPayment;
+
+// EDIT OVERLAY FUNCTIONS
+let _editCtx = null;
+function _ef(lbl,id,val,type="text"){return `<div class="fg"><label>${lbl}</label><input id="ef_${id}" type="${type}" value="${String(val||"").replace(/"/g,"&quot;")}"></div>`;}
+function _efs(lbl,id,val,opts){let s=`<div class="fg"><label>${lbl}</label><select id="ef_${id}">`;opts.forEach(o=>s+=`<option${o===val?" selected":""}>${o}</option>`);return s+"</select></div>";}
+function _efta(lbl,id,val){return `<div class="fg"><label>${lbl}</label><textarea id="ef_${id}" style="min-height:50px;width:100%;padding:9px;border:1.5px solid #dce1e8;border-radius:8px;font-size:14px;font-family:inherit;">${String(val||"")}</textarea></div>`;}
+function _gef(id){return(document.getElementById("ef_"+id)||{value:""}).value||"";}
+function openEdit(type,idx){
+  _editCtx={type,idx};let h="";
+  const ttl=g("editTitle"),flds=g("editFields");
+  if(type==="sales"){const s=db.sales[idx];ttl.innerText="Edit Sale";h=_ef("Customer Name","n",s.n)+`<div class="edit-row">`+_ef("Phone","phone",s.phone,"tel")+_ef("Sale Date","date",s.date,"date")+`</div>`+_ef("Item / Product","item",s.item)+`<div class="edit-row">`+_ef("Total Amount","amt",s.amt,"number")+_ef("Advance Paid","adv",s.adv||0,"number")+`</div>`+`<div class="edit-row">`+_ef("Due Date","dueDate",s.dueDate,"date")+_efs("Mode","mode",s.mode,["Cash","UPI","Card","Credit/EMI","Cheque","Mixed"])+`</div>`+_efta("Note","note",s.note);}
+  else if(type==="leads"){const l=db.leads[idx];ttl.innerText="Edit Lead";h=_ef("Customer Name","n",l.n)+`<div class="edit-row">`+_ef("Phone","phone",l.phone,"tel")+_ef("Follow-up Date","d",l.d,"date")+`</div>`+_ef("Interested In","item",l.item)+`<div class="edit-row">`+_ef("Budget","budget",l.budget||0,"number")+_efs("Priority","priority",l.priority,["Hot","Warm","Cold"])+`</div>`+_efs("Source","source",l.source,["Walk-in","Referral","Social Media","Phone Enquiry","IM Lead","Other"])+_efta("Note","note",l.note);}
+  else if(type==="orders"){const o=db.orders[idx];ttl.innerText="Edit Order";h=_ef("Customer Name","n",o.n)+`<div class="edit-row">`+_ef("Phone","phone",o.phone,"tel")+_ef("Delivery Date","d",o.d,"date")+`</div>`+_ef("Item","item",o.item)+_ef("Delivery Address","addr",o.addr)+_ef("Linked Bill No.","linkBill",o.linkBill)+_efta("Note","note",o.note);}
+  else if(type==="payments"){const x=db.payments[idx];ttl.innerText="Edit Payment";h=_ef("Customer Name","n",x.n)+`<div class="edit-row">`+_ef("Phone","phone",x.phone,"tel")+_ef("Amount","amt",x.a,"number")+`</div>`+`<div class="edit-row">`+_ef("Due Date","d",x.d,"date")+_ef("Ref No.","bill",x.bill)+`</div>`+_efta("Note","note",x.note);}
+  else if(type==="expenses"){const x=db.expenses[idx];ttl.innerText="Edit Expense";h=_efs("Category","cat",x.cat,["Transport","Salary","Rent","Electricity","Stock Purchase","Maintenance","Marketing","Other"])+_ef("Amount","amt",x.a,"number")+_ef("Description","desc",x.desc)+_efta("Note","note",x.note);}
+  flds.innerHTML=h;g("editOv").style.display="block";
+}
+function saveEdit(){
+  if(!_editCtx)return;const{type,idx}=_editCtx;
+  if(type==="sales"){const s=db.sales[idx];const n=_gef("n");if(n)s.n=n;s.phone=_gef("phone");const it=_gef("item");if(it)s.item=it;const am=parseFloat(_gef("amt"));if(am>0)s.amt=am;const ad=parseFloat(_gef("adv"));if(!isNaN(ad))s.adv=ad;const dt=_gef("date");if(dt)s.date=dt;s.dueDate=_gef("dueDate");s.mode=_gef("mode");s.note=_gef("note");}
+  else if(type==="leads"){const l=db.leads[idx];const n=_gef("n");if(n)l.n=n;l.phone=_gef("phone");l.item=_gef("item");const d=_gef("d");if(d)l.d=d;const b=parseFloat(_gef("budget"));if(!isNaN(b))l.budget=b;l.priority=_gef("priority");l.source=_gef("source");l.note=_gef("note");}
+  else if(type==="orders"){const o=db.orders[idx];const n=_gef("n");if(n)o.n=n;o.phone=_gef("phone");o.item=_gef("item");const d=_gef("d");if(d)o.d=d;o.addr=_gef("addr");o.linkBill=_gef("linkBill");o.note=_gef("note");}
+  else if(type==="payments"){const x=db.payments[idx];const n=_gef("n");if(n)x.n=n;x.phone=_gef("phone");const am=parseFloat(_gef("amt"));if(am>0)x.a=am;const d=_gef("d");if(d)x.d=d;x.bill=_gef("bill");x.note=_gef("note");}
+  else if(type==="expenses"){const x=db.expenses[idx];x.cat=_gef("cat");const am=parseFloat(_gef("amt"));if(am>0)x.a=am;const ds=_gef("desc");if(ds)x.desc=ds;x.note=_gef("note");}
+  closeEdit();saveDB();render();checkRem();
+}
+function closeEdit(){g("editOv").style.display="none";_editCtx=null;}
+
+window.openEdit=openEdit;window.saveEdit=saveEdit;window.closeEdit=closeEdit;window.closeEdit=closeEdit;window.editSN=editSN;window.editLN=editLN;window.editON=editON;
+
+function showBill(si){
+  curBillIdx=si;
+  const s=db.sales[si],d=due(s);
+  let h=`<h3>Sri Sai Home Needs</h3><div class="biz-sub">Furniture Shop, Chandanagar</div>
+<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:8px;">
+<span>Bill: <b>${esc(s.bill||"---")}</b></span><span>Date: <b>${s.date}</b></span></div>
+<div class="bill-row"><span>Customer</span><span><b>${esc(s.n)}</b></span></div>
+${s.phone?`<div class="bill-row"><span>Phone</span><span>${esc(s.phone)}</span></div>`:""}
+<div style="margin:8px 0 3px;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;">Items</div>
+<div class="bill-row"><span>${esc(s.item||"---")}</span><span>---</span></div>
+<div class="bill-total"><span>Total Amount</span><span>Rs.${s.amt.toFixed(2)}</span></div>
+<div class="bill-row"><span>Advance Paid</span><span>Rs.${(s.adv||0).toFixed(2)}</span></div>`;
+  if(d>0)h+=`<div class="bill-row" style="color:var(--red);"><span>Balance Due</span><span><b>Rs.${d.toFixed(2)}</b></span></div>${s.dueDate?`<div class="bill-row"><span>Due Date</span><span>${s.dueDate}</span></div>`:""}`;
+  h+=`<div class="bill-row"><span>Payment Mode</span><span>${esc(s.mode||"---")}</span></div>`;
+  if(d===0)h+=`<div style="text-align:center;margin-top:10px;color:var(--green);font-weight:900;">PAID IN FULL</div>`;
+  h+=`<div style="text-align:center;margin-top:14px;font-size:11px;color:var(--muted);">Thank you!<br>Sri Sai Home Needs, Chandanagar</div>`;
+  g("billContent").innerHTML=h;
+  g("billOv").style.display="flex";
+}
+window.showBill=showBill;
+g("btnCB").addEventListener("click",()=>{g("billOv").style.display="none";curBillIdx=-1;});
+g("btnPrint").addEventListener("click",()=>{
+  const win=window.open("","_blank");
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Bill</title>
+<style>body{font-family:Arial,sans-serif;padding:18px;max-width:380px;margin:0 auto;font-size:12px;}
+h3{text-align:center;}.biz-sub{text-align:center;font-size:11px;color:#666;margin-bottom:10px;}
+.bill-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #eee;}
+.bill-total{display:flex;justify-content:space-between;padding:5px 0;font-weight:900;font-size:13px;border-top:2px solid #333;margin-top:3px;}
+</style></head><body>${g("billContent").innerHTML}</body></html>`);
+  win.document.close();win.print();
+});
+g("btnWA").addEventListener("click",()=>{
+  if(curBillIdx<0)return;
+  const s=db.sales[curBillIdx],d=due(s);
+  if(!s.phone){alert("No phone number for this customer.");return;}
+  const msg="*Sri Sai Home Needs - Bill*\nFurniture Shop, Chandanagar\n\n"
+    +"*Bill No:* "+(s.bill||"---")+"\n*Date:* "+s.date+"\n*Customer:* "+s.n+"\n\n"
+    +"*Item:* "+(s.item||"---")+"\n\n"
+    +"*Total:* Rs."+s.amt.toFixed(2)+"\n*Advance Paid:* Rs."+(s.adv||0).toFixed(2)+"\n"
+    +(d>0?"*Balance Due:* Rs."+d.toFixed(2)+(s.dueDate?" (by "+s.dueDate+")":"")+"\n":"*Status:* PAID IN FULL\n")
+    +"\nThank you!\nSri Sai Home Needs, Chandanagar";
+  let ph=s.phone.replace(/[^0-9]/g,"");
+  if(ph.length===10)ph="91"+ph;
+  window.open("https://wa.me/"+ph+"?text="+encodeURIComponent(msg),"_blank");
+});
+
+function render(){
+  // SALES
+  let arr=filt(db.sales,"searchSales").filter(x=>{
+    const st=stOf(x);
+    if(saleFilter==="all")return true;
+    if(saleFilter==="closed")return st==="closed";
+    if(saleFilter==="inprog")return st==="inprog"||st==="pending";
+    if(saleFilter==="overdue")return st!=="closed"&&x.dueDate&&x.dueDate<TODAY;
+    return true;
+  });
+  let tAmt=0,tDue=0,html="";
+  arr.forEach(x=>{
+    const ri=db.sales.indexOf(x),st=stOf(x),d=due(x),pct=x.amt>0?Math.round(((x.adv||0)/x.amt)*100):100;
+    tAmt+=x.amt;tDue+=d;
+    const sl=st==="closed"?'<span class="badge b-closed">Closed</span>':st==="inprog"?'<span class="badge b-partial">In-Progress</span>':'<span class="badge b-pending">Pending</span>';
+    html+=`<div class="rec ${st==="closed"?"closed-r":st==="inprog"?"inprog-r":""}">
+<div class="rec-name">${esc(x.n)}${x.bill?` <span style="font-size:10px;color:var(--muted);">#${esc(x.bill)}</span>`:""}${sl}${st!=="closed"&&x.dueDate?dbadge(x.dueDate):""}</div>
+<div class="rec-sub">${x.date}${x.item?" | "+esc(x.item):""} | ${esc(x.mode||"")}${x.phone?" | "+esc(x.phone):""}</div>
+<div class="rec-sub">Total: <b>Rs.${x.amt.toFixed(2)}</b> | Paid: <b>Rs.${(x.adv||0).toFixed(2)}</b>${d>0?` | Due: <b style="color:var(--red)">Rs.${d.toFixed(2)}</b>`:""}${x.dueDate&&st!=="closed"?" | by "+x.dueDate:""}</div>
+<div class="pay-bar-wrap"><div class="pay-bar-fill" style="width:${pct}%"></div></div>
+<div style="font-size:10px;color:var(--muted);margin-bottom:2px;">${pct}% paid</div>
+${x.delivery?`<div class="rec-sub">Delivery: ${x.delDate||"TBD"}${x.delAddr?" - "+esc(x.delAddr):""}</div>`:""}
+${x.note?`<div class="note-chip">${esc(x.note)}</div>`:""}
+<div class="row-btn">
+${x.phone?`<button class="btn btn-call" onclick="callCust(this.dataset.p)" data-p="${esc(x.phone)}">Call</button>`:""}
+${x.phone?`<button class="btn btn-wa" onclick="waCust(this.dataset.p)" data-p="${esc(x.phone)}">WA</button>`:""}
+<button class="btn btn-blue" onclick="showBill(${ri})">Bill</button>
+${st!=="closed"?`<button class="btn btn-done" onclick="collectPay(${ri})">Collect</button>`:""}
+<button class="btn" style="background:var(--muted);" onclick="editSN(${ri})">Note</button>
+<button class="btn btn-del" onclick="delItem('sales',${ri})">Del</button>
+</div></div>`;
+  });
+  g("salesList").innerHTML=html||'<div class="empty"><div class="ei">&#128176;</div>No sales found</div>';
+  g("sScount").textContent=arr.length;g("sSamt").textContent=tAmt.toFixed(2);g("sSDue").textContent=tDue.toFixed(2);
+
+  // AUTO DUE
+  const adArr=db.sales.filter(x=>stOf(x)!=="closed");
+  let adH=adArr.length===0?'<div style="font-size:12px;color:var(--green);padding:7px 0;">No pending dues!</div>':"";
+  adArr.forEach(x=>{
+    const ri=db.sales.indexOf(x),d=due(x);
+    adH+=`<div style="padding:7px 0;border-bottom:1px solid #ecf0f1;font-size:12px;">
+<b>${esc(x.n)}</b>${x.bill?" #"+esc(x.bill):""} - Rs.${d.toFixed(2)}${x.dueDate?" | Due: "+x.dueDate+dbadge(x.dueDate):""}
+${x.phone?`<br><a href="tel:${esc(x.phone)}" style="color:var(--orange);font-weight:700;">${esc(x.phone)}</a>`:""}
+<button class="btn btn-done" style="padding:4px 9px;font-size:11px;" onclick="collectPay(${ri})">Collect</button>
+${x.phone?`<button class="btn btn-wa" style="padding:4px 7px;font-size:11px;" onclick="waCust(this.dataset.p)" data-p="${esc(x.phone)}">WA</button>`:""}
+</div>`;
+  });
+  g("autoDueList").innerHTML=adH;
+
+  // LEADS
+  let lArr=filt(db.leads,"searchLeads").filter(x=>{
+    if(leadFilter==="all")return !x.done;
+    if(leadFilter==="due")return !x.done&&x.d<=TODAY;
+    return !x.done&&x.priority===leadFilter;
+  });
+  let lH="";
+  lArr.forEach(x=>{
+    const ri=db.leads.indexOf(x);
+    lH+=`<div class="rec lead-r">
+<div class="rec-name" style="border-left:3px solid ${pcolor(x.priority||"Warm")};padding-left:5px;">${esc(x.n)}${dbadge(x.d)}${x.priority?`<span class="badge" style="background:#f4f6f7;color:${pcolor(x.priority)};">${x.priority}</span>`:""}</div>
+<div class="rec-sub">Follow-up: ${x.d}${x.phone?" | "+esc(x.phone):""}${x.item?"<br>"+esc(x.item):""}${x.budget?" | Budget: Rs."+x.budget:""}</div>
+${x.source?`<div class="rec-sub">Source: ${esc(x.source)}</div>`:""}
+${x.note?`<div class="note-chip">${esc(x.note)}</div>`:""}
+<div class="row-btn">
+${x.phone?`<button class="btn btn-call" onclick="callCust(this.dataset.p)" data-p="${esc(x.phone)}">Call</button>`:""}
+${x.phone?`<button class="btn btn-wa" onclick="waLead(ri)">WA</button>`:""}
+<button class="btn btn-blue" onclick="editLN(${ri})">Edit</button>
+<button class="btn btn-done" onclick="markDone('leads',${ri})">Done</button>
+<button class="btn btn-del" onclick="delItem('leads',${ri})">Del</button>
+</div></div>`;
+  });
+  g("leadList").innerHTML=lH||'<div class="empty"><div class="ei">&#128203;</div>No leads found</div>';
+
+  // ORDERS
+  let oArr=filt(db.orders,"searchOrders"),oH="";
+  oArr.forEach(x=>{
+    const ri=db.orders.indexOf(x);
+    oH+=`<div class="rec order-r${x.done?" closed-r":""}">
+<div class="rec-name">${esc(x.n)}${x.done?'<span class="badge b-closed">Delivered</span>':dbadge(x.d)}</div>
+<div class="rec-sub">Delivery: ${x.d}${x.phone?" | "+esc(x.phone):""}${x.item?"<br>"+esc(x.item):""}${x.addr?"<br>"+esc(x.addr):""}</div>
+${x.linkBill?`<div class="order-tag">Linked: ${esc(x.linkBill)}</div>`:""}
+${x.note?`<div class="note-chip">${esc(x.note)}</div>`:""}
+<div class="row-btn">
+${x.phone?`<button class="btn btn-call" onclick="callCust(this.dataset.p)" data-p="${esc(x.phone)}">Call</button>`:""}
+${x.phone?`<button class="btn btn-wa" onclick="waOrder(ri)">WA</button>`:""}
+${!x.done?`<button class="btn btn-done" onclick="markDone('orders',${ri})">Delivered</button>`:""}
+<button class="btn btn-blue" onclick="editON(${ri})">Edit</button>
+<button class="btn btn-del" onclick="delItem('orders',${ri})">Del</button>
+</div></div>`;
+  });
+  g("orderList").innerHTML=oH||'<div class="empty"><div class="ei">&#128230;</div>No orders yet</div>';
+
+  // PAYMENTS
+  let pArr=filt(db.payments,"searchPay"),pPend=0,pH="";
+  pArr.forEach(x=>{
+    const ri=db.payments.indexOf(x);
+    if(!x.done)pPend+=x.a;
+    pH+=`<div class="rec pay-r${x.done?" closed-r":""}">
+<div class="rec-name">${esc(x.n)}${x.done?'<span class="badge b-closed">Paid</span>':'<span class="badge b-pending">Unpaid</span>'}${!x.done?dbadge(x.d):""}</div>
+<div class="rec-sub">Rs.${x.a.toFixed(2)} | Due: ${x.d}${x.bill?" | #"+esc(x.bill):""}${x.phone?" | "+esc(x.phone):""}</div>
+${x.note?`<div class="note-chip">${esc(x.note)}</div>`:""}
+<div class="row-btn">
+${x.phone?`<button class="btn btn-call" onclick="callCust(this.dataset.p)" data-p="${esc(x.phone)}">Call</button>`:""}
+${x.phone?`<button class="btn btn-wa" onclick="waPayment(ri)">WA</button>`:""}
+${!x.done?`<button class="btn btn-done" onclick="markDone('payments',${ri})">Mark Paid</button>`:""}
+<button class="btn btn-del" onclick="delItem('payments',${ri})">Del</button>
+</div></div>`;
+  });
+  g("payList").innerHTML=pH||'<div class="empty"><div class="ei">&#128184;</div>No standalone payments</div>';
+  g("payPendTot").textContent=pPend.toFixed(2);
+
+  // EXPENSES
+  let eArr=filt(db.expenses,"searchExp"),eTot=0,eH="";
+  eArr.forEach(x=>{
+    const ri=db.expenses.indexOf(x);eTot+=x.a;
+    eH+=`<div class="rec exp-r">
+<div class="rec-name">${esc(x.desc)} <span style="font-size:10px;color:var(--muted);">[${esc(x.cat)}]</span></div>
+<div class="rec-sub">Rs.${x.a.toFixed(2)} | ${x.date}</div>
+${x.note?`<div class="note-chip">${esc(x.note)}</div>`:""}
+<div class="row-btn"><button class="btn btn-del" onclick="delItem('expenses',${ri})">Delete</button></div>
+</div>`;
+  });
+  g("expList").innerHTML=eH||'<div class="empty"><div class="ei">&#129534;</div>No expenses yet</div>';
+  g("expTot").textContent=eTot.toFixed(2);
+
+  // DASHBOARD
+  let aS=0,tS=0,tD=0,iC=0,cC=0;
+  db.sales.forEach(x=>{aS+=x.amt;if(x.date===TODAY)tS+=x.amt;tD+=due(x);stOf(x)==="closed"?cC++:iC++;});
+  const aE=db.expenses.reduce((s,x)=>s+x.a,0);
+  const pL=db.leads.filter(x=>!x.done).length, pO=db.orders.filter(x=>!x.done).length;
+  const prof=aS-aE;
+  g("dTodaySales").textContent=tS.toFixed(2);g("dTotalSales").textContent=aS.toFixed(2);
+  g("dTotalDue").textContent=tD.toFixed(2);g("dLeads").textContent=pL;g("dOrders").textContent=pO;
+  g("dExpenses").textContent=aE.toFixed(2);g("dInprog").textContent=iC;g("dClosed").textContent=cC;
+  const pp=g("profitPill");
+  pp.innerHTML=`Net Profit: <b>Rs.${prof.toFixed(2)}</b> ${prof>=0?"(UP)":"(DOWN)"}`;
+  pp.style.background=prof>=0?"linear-gradient(90deg,#eafaf1,#d5f5e3)":"linear-gradient(90deg,#fdecea,#fadbd8)";
+  pp.style.color=prof>=0?"var(--green)":"var(--red)";
+  g("quickSummary").innerHTML=`Total Bills: <b>${db.sales.length}</b> | Closed: <b>${cC}</b> | In-Progress: <b>${iC}</b><br>Active Leads: <b>${pL}</b> | Pending Deliveries: <b>${pO}</b><br>Total Due: <b style="color:var(--red)">Rs.${tD.toFixed(2)}</b>`;
+
+  let tfu=[];
+  db.leads.forEach(x=>{if(!x.done&&x.d===TODAY)tfu.push(`Lead: <b>${esc(x.n)}</b>${x.phone?` <a class="fu-item" href="tel:${esc(x.phone)}">${esc(x.phone)}</a>`:""}`);});
+  db.orders.forEach(x=>{if(!x.done&&x.d===TODAY)tfu.push(`Delivery: <b>${esc(x.n)}</b>${x.phone?` <a class="fu-item" href="tel:${esc(x.phone)}">${esc(x.phone)}</a>`:""}`);});
+  db.sales.forEach(x=>{if(stOf(x)!=="closed"&&x.dueDate===TODAY)tfu.push(`Payment Due: <b>${esc(x.n)}</b> Rs.${due(x).toFixed(2)}${x.phone?` <a class="fu-item" href="tel:${esc(x.phone)}">${esc(x.phone)}</a>`:""}`);});
+  g("todayFU").innerHTML=tfu.length?tfu.map(t=>`<div class="fu-item">${t}</div>`).join(""):'<div class="empty" style="padding:8px 0"><div class="ei">&#127881;</div>No follow-ups today!</div>';
+
+  let odu=[];
+  db.sales.forEach(x=>{if(stOf(x)!=="closed"&&x.dueDate&&x.dueDate<TODAY)odu.push(`<div class="fu-item">OVERDUE: <b>${esc(x.n)}</b>${x.bill?" #"+esc(x.bill):""} Rs.${due(x).toFixed(2)} since ${x.dueDate}${x.phone?` <a class="fu-item" href="tel:${esc(x.phone)}">${esc(x.phone)}</a>`:""}</div>`);});
+  db.payments.forEach(x=>{if(!x.done&&x.d<TODAY)odu.push(`<div class="fu-item">OVERDUE: <b>${esc(x.n)}</b> Rs.${x.a.toFixed(2)} since ${x.d}${x.phone?` <a class="fu-item" href="tel:${esc(x.phone)}">${esc(x.phone)}</a>`:""}</div>`);});
+  g("overduePay").innerHTML=odu.length?odu.join(""):'<div style="font-size:12px;color:var(--green);padding:5px 0;">No overdue payments!</div>';
+}
+
+function checkRem(){
+  let due2=[];
+  db.leads.forEach(x=>{if(!x.done&&x.d<=TODAY)due2.push((x.d<TODAY?"OVERDUE - ":"Today - ")+"Lead: "+x.n+(x.phone?" ("+x.phone+")":"")+(x.item?" - "+x.item:"")+" | "+x.d);});
+  db.orders.forEach(x=>{if(!x.done&&x.d<=TODAY)due2.push((x.d<TODAY?"OVERDUE - ":"Today - ")+"Delivery: "+x.n+(x.phone?" ("+x.phone+")":"")+(x.item?" - "+x.item:"")+" | "+x.d);});
+  db.sales.forEach(x=>{if(stOf(x)!=="closed"&&x.dueDate&&x.dueDate<=TODAY)due2.push((x.dueDate<TODAY?"OVERDUE - ":"Today - ")+"Payment: "+x.n+" Rs."+due(x).toFixed(2)+(x.phone?" ("+x.phone+")":"")+" | "+x.dueDate);});
+  db.payments.forEach(x=>{if(!x.done&&x.d<=TODAY)due2.push((x.d<TODAY?"OVERDUE - ":"Today - ")+"Due: "+x.n+" Rs."+x.a+(x.phone?" ("+x.phone+")":"")+" | "+x.d);});
+  if(due2.length){g("remList").innerHTML=due2.map(d=>`<li>${d}</li>`).join("");g("remOv").style.display="flex";}
+  else g("remOv").style.display="none";
+}
+g("btnROk").addEventListener("click",()=>g("remOv").style.display="none");
+
+g("btnRep").addEventListener("click",()=>{
+  const from=g("repFrom").value,to=g("repTo").value;
+  if(!from||!to){alert("Select date range.");return;}
+  const sales=db.sales.filter(x=>x.date>=from&&x.date<=to);
+  const exps=db.expenses.filter(x=>x.date>=from&&x.date<=to);
+  const sA=sales.reduce((s,x)=>s+x.amt,0),sD=sales.reduce((s,x)=>s+due(x),0),eA=exps.reduce((s,x)=>s+x.a,0),pr=sA-eA;
+  g("reportOut").innerHTML=`<div class="card"><div class="card-title">Report: ${from} to ${to}</div>
+<div class="dash-grid">
+<div class="tile t1"><div class="ti">&#128176;</div><div class="tv">Rs.${sA.toFixed(2)}</div><div class="tl">Sales (${sales.length})</div></div>
+<div class="tile t5"><div class="ti">&#8987;</div><div class="tv">Rs.${sD.toFixed(2)}</div><div class="tl">Still Due</div></div>
+<div class="tile t6"><div class="ti">&#129534;</div><div class="tv">Rs.${eA.toFixed(2)}</div><div class="tl">Expenses</div></div>
+<div class="tile ${pr>=0?"t1":"t5"}"><div class="ti">${pr>=0?"&#128200;":"&#128201;"}</div><div class="tv">Rs.${pr.toFixed(2)}</div><div class="tl">Net Profit</div></div>
+</div></div>`;
+});
+
+function exportData(){
+  const rows=[["Type","Bill","Date","Customer","Phone","Item","Total","Paid","Due","Due Date","Mode","Status","Note"]];
+  db.sales.forEach(x=>rows.push(["Sale",x.bill||"",x.date,x.n,x.phone||"",x.item||"",x.amt,(x.adv||0),due(x),x.dueDate||"",x.mode,stOf(x),x.note||""]));
+  db.leads.forEach(x=>rows.push(["Lead","","",x.n,x.phone||"",x.item||"","","","",x.d,x.source,x.done?"Done":x.priority,x.note||""]));
+  db.orders.forEach(x=>rows.push(["Order",x.linkBill||"","",x.n,x.phone||"",x.item||"","","","",x.d,"",x.done?"Delivered":"Pending",x.note||""]));
+  db.payments.forEach(x=>rows.push(["Payment",x.bill||"","",x.n,x.phone||"","",x.a,"",x.a,x.d,"",x.done?"Paid":"Unpaid",x.note||""]));
+  db.expenses.forEach(x=>rows.push(["Expense","",x.date,"","",x.desc,x.a,"","","",x.cat,"",x.note||""]));
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const blob=new Blob([csv],{type:"text/csv"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");a.href=url;a.download="SriSai_"+TODAY+".csv";a.click();
+}
+g("btnExport").addEventListener("click",exportData);
+g("btnExport2").addEventListener("click",exportData);
+
+g("btnClr").addEventListener("click",()=>{
+  if(!isAdmin){alert("Only Admin (PIN 1978) can clear all data.");return;}
+  if(!confirm("WARNING\n\nYou are about to DELETE ALL DATA permanently.\n\nThis cannot be undone. Continue?"))return;
+  if(!confirm("SECOND CONFIRMATION\n\nAll Sales, Leads, Orders, Payments and Expenses will be erased forever.\n\nAre you sure?"))return;
+  if(!confirm("FINAL CHECK\n\nAbsolutely sure? This is your last chance to cancel."))return;
+  {
+    if(true){
+      db={sales:[],leads:[],orders:[],payments:[],expenses:[]};
+      billCounter=1;saveDB();render();alert("All data cleared.");
+    }
+  }
+});
+
+</script>
+</body>
+</html>
